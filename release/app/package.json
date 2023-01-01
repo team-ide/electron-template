@@ -1,12 +1,12 @@
 {
-  "name": "electron-react-boilerplate",
-  "version": "4.6.0",
-  "description": "A foundation for scalable desktop apps",
+  "name": "electron-server-demo",
+  "version": "1.0.0",
+  "description": "electron server desktop apps",
   "license": "MIT",
   "author": {
-    "name": "Electron React Boilerplate Maintainers",
-    "email": "electronreactboilerplate@gmail.com",
-    "url": "https://github.com/electron-react-boilerplate"
+    "name": "朱亮",
+    "email": "teamide@163.com",
+    "url": "https://github.com/team-ide"
   },
   "main": "./dist/main/main.js",
   "scripts": {

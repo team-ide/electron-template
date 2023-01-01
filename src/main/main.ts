@@ -9,19 +9,9 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import { app, BrowserWindow, shell, ipcMain } from 'electron';
-import { autoUpdater } from 'electron-updater';
-import log from 'electron-log';
-import MenuBuilder from './menu';
+import { app, BrowserWindow, shell, ipcMain, Menu, Tray, screen } from 'electron';
 import { resolveHtmlPath } from './util';
-
-class AppUpdater {
-  constructor() {
-    log.transports.file.level = 'info';
-    autoUpdater.logger = log;
-    autoUpdater.checkForUpdatesAndNotify();
-  }
-}
+const child_process = require('child_process');
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -39,27 +29,52 @@ if (process.env.NODE_ENV === 'production') {
 const isDebug =
   process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true';
 
-if (isDebug) {
-  require('electron-debug')();
-}
+// if (isDebug) {
+// require('electron-debug')();
+// }
 
-const installExtensions = async () => {
-  const installer = require('electron-devtools-installer');
-  const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
-  const extensions = ['REACT_DEVELOPER_TOOLS'];
+// const installExtensions = async () => {
+//   const installer = require('electron-devtools-installer');
+//   const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
+//   const extensions = ['REACT_DEVELOPER_TOOLS'];
 
-  return installer
-    .default(
-      extensions.map((name) => installer[name]),
-      forceDownload
-    )
-    .catch(console.log);
+//   return installer
+//     .default(
+//       extensions.map((name) => installer[name]),
+//       forceDownload
+//     )
+//     .catch(console.log);
+// };
+
+const RESOURCES_PATH = app.isPackaged
+  ? path.join(process.resourcesPath, 'assets')
+  : path.join(__dirname, '../../assets');
+
+const getAssetPath = (...paths: string[]): string => {
+  return path.join(RESOURCES_PATH, ...paths);
 };
 
+
+const ROOT_PATH = app.isPackaged
+  ? path.join(process.resourcesPath, '')
+  : path.join(__dirname, '../../');
+
+
+export const getRootPath = (...paths: string[]): string => {
+  return path.join(ROOT_PATH, ...paths);
+};
+
+export const iconPath = getAssetPath('icon.png');
+export const icon16Path = getAssetPath('icon-16.png');
+export const icon32Path = getAssetPath('icon-32.png');
+export const icon64Path = getAssetPath('icon-64.png');
+
+let serverUrl = resolveHtmlPath('index.html')
+
 const createWindow = async () => {
-  if (isDebug) {
-    await installExtensions();
-  }
+  // if (isDebug) {
+  //   await installExtensions();
+  // }
 
   const RESOURCES_PATH = app.isPackaged
     ? path.join(process.resourcesPath, 'assets')
@@ -69,11 +84,26 @@ const createWindow = async () => {
     return path.join(RESOURCES_PATH, ...paths);
   };
 
+  //获取到屏幕的宽度和高度
+  const { width, height } = screen.getPrimaryDisplay().workAreaSize;
+
+
+  let windowWidth = 1440;
+  let windowHeight = 900;
+  if (windowWidth > width) {
+    windowWidth = (width - 40);
+  }
+  if (windowHeight > height) {
+    windowHeight = (height - 40);
+  }
+
+
   mainWindow = new BrowserWindow({
     show: false,
-    width: 1024,
-    height: 728,
-    icon: getAssetPath('icon.png'),
+    width: windowWidth,
+    height: windowHeight,
+    icon: iconPath,
+    autoHideMenuBar: true,
     webPreferences: {
       preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')
@@ -81,7 +111,7 @@ const createWindow = async () => {
     },
   });
 
-  mainWindow.loadURL(resolveHtmlPath('index.html'));
+  mainWindow.loadURL(serverUrl);
 
   mainWindow.on('ready-to-show', () => {
     if (!mainWindow) {
@@ -98,18 +128,12 @@ const createWindow = async () => {
     mainWindow = null;
   });
 
-  const menuBuilder = new MenuBuilder(mainWindow);
-  menuBuilder.buildMenu();
-
+  Menu.setApplicationMenu(null);
   // Open urls in the user's browser
   mainWindow.webContents.setWindowOpenHandler((edata) => {
     shell.openExternal(edata.url);
     return { action: 'deny' };
   });
-
-  // Remove this if your app does not use auto updates
-  // eslint-disable-next-line
-  new AppUpdater();
 };
 
 /**
@@ -135,3 +159,110 @@ app
     });
   })
   .catch(console.log);
+
+let tray: Tray | null = null;
+app.on('ready', async () => {
+  if (process.platform === 'darwin') {
+    tray = new Tray(icon16Path)
+  } else {
+    tray = new Tray(icon64Path)
+  }
+  const contextMenu = Menu.buildFromTemplate([
+    {
+      label: '退出',
+      click: function () {
+        destroyAll()
+      }
+    }
+  ])
+  tray.setToolTip('Team · IDE')
+  if (process.platform === `darwin`) {
+    //显示程序页面
+    tray.on('mouse-up', () => {
+      if (isAllWindowHide) {
+        allWindowShow();
+      } else {
+        allWindowHide();
+      }
+    })
+  } else {
+    //显示程序页面
+    tray.on('click', () => {
+      if (isAllWindowHide) {
+        allWindowShow();
+      } else {
+        allWindowHide();
+      }
+    })
+  }
+  tray.setContextMenu(contextMenu)
+})
+
+let serverProcess: any = null;
+let viewWindowList: BrowserWindow[] = [];
+let isAllWindowHide = false;
+let allWindowShow = async () => {
+  isAllWindowHide = false;
+  if (mainWindow != null && !mainWindow.isDestroyed()) {
+    mainWindow.show();
+  }
+  viewWindowList.forEach((one: BrowserWindow) => {
+    if (!one.isDestroyed()) {
+      one.show();
+    }
+  })
+};
+let allWindowHide = () => {
+  isAllWindowHide = true;
+  if (mainWindow != null && !mainWindow.isDestroyed()) {
+    mainWindow.hide();
+  }
+  viewWindowList.forEach((one: BrowserWindow) => {
+    if (!one.isDestroyed()) {
+      one.hide();
+    }
+  })
+
+};
+let allWindowDestroy = () => {
+  if (mainWindow != null && !mainWindow.isDestroyed()) {
+    mainWindow.destroy();
+    mainWindow = null;
+  }
+  viewWindowList.forEach((one: BrowserWindow) => {
+    if (!one.isDestroyed()) {
+      one.destroy();
+    }
+  })
+  viewWindowList.splice(0, viewWindowList.length)
+};
+let isStopped = false
+let destroyAll = () => {
+  isStopped = true
+  try {
+    allWindowDestroy()
+  } catch (error) {
+
+  }
+  try {
+    if (serverProcess != null) {
+      serverProcess.kill();
+    }
+  } catch (error) {
+
+  }
+  try {
+    if (tray != null) {
+      tray.destroy()
+    }
+  } catch (error) {
+
+  }
+  try {
+    if (app != null) {
+      app.quit()
+    }
+  } catch (error) {
+
+  }
+}

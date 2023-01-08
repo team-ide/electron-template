@@ -12,23 +12,23 @@ export default {
     // 服务配置
     server: {
         // 服务根目录
-        dir: "./server",
+        dir: "./statics/server",
         // so、dll库等
         libDir: "",
         // darwin 系统服务配置
         darwin: {
-            exec: "",
-            args: [],
+            exec: "./server",
+            args: ["-isElectron", "1"],
         },
         // linux 系统服务配置
         linux: {
-            exec: "",
-            args: [],
+            exec: "./server",
+            args: ["-isElectron", "1"],
         },
         // win 系统服务配置
         win: {
-            exec: "go",
-            args: ["run", ".", "-isElectron", "1"],
+            exec: "./server.exe",
+            args: ["-isElectron", "1"],
         }
     },
 }

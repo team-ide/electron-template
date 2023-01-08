@@ -176,18 +176,30 @@
     ],
     "afterSign": ".erb/scripts/notarize.js",
     "mac": {
-      "target": {
-        "target": "default",
-        "arch": [
-          "arm64",
-          "x64"
-        ]
-      },
+      "artifactName": "${productName}-mac-${version}.${ext}",
+      "target": [
+        {
+          "target": "zip",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "dmg",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
       "type": "distribution",
       "hardenedRuntime": true,
       "entitlements": "assets/entitlements.mac.plist",
       "entitlementsInherit": "assets/entitlements.mac.plist",
-      "gatekeeperAssess": false
+      "gatekeeperAssess": false,
+      "extraResources": [
+        "./assets/**",
+        "./statics/**"
+      ]
     },
     "dmg": {
       "contents": [
@@ -204,15 +216,48 @@
       ]
     },
     "win": {
+      "artifactName": "${productName}-windows-x64-${version}.${ext}",
       "target": [
-        "nsis"
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "publisherName": "ZhuLiang",
+      "extraResources": [
+        "./assets/**",
+        "./statics/**"
       ]
     },
     "linux": {
+      "artifactName": "${productName}-linux-x64-${version}.${ext}",
       "target": [
-        "AppImage"
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "x64"
+          ]
+        }
       ],
-      "category": "Development"
+      "category": "Development",
+      "extraResources": [
+        "./assets/**",
+        "./statics/**"
+      ]
     },
     "directories": {
       "app": "release/app",
@@ -220,7 +265,8 @@
       "output": "release/build"
     },
     "extraResources": [
-      "./assets/**"
+      "./assets/**",
+      "./statics/**"
     ],
     "publish": {
       "provider": "github",

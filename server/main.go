@@ -28,6 +28,15 @@ func flagParse() {
 	}()
 	flag.Parse()
 }
+
+var (
+	version = ""
+)
+
+func GetVersion() string {
+	return version
+}
+
 func main() {
 	flagParse()
 
@@ -92,7 +101,7 @@ func startServer(addr string) (serverUrl string, err error) {
 		if err != nil {
 			log.Fatalf("parsing: %s", err)
 		}
-		_ = tmpl.Execute(c.Writer, "Team IDE Server Index Page")
+		_ = tmpl.Execute(c.Writer, "Server Version:"+GetVersion())
 	})
 
 	if strings.HasPrefix(addr, ":") {

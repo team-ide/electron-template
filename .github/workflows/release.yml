@@ -45,7 +45,6 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           chmod +x statics/server/server
-          cd electron
           npm install
           npm run postinstall
           npm run build
@@ -97,7 +96,6 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           chmod +x statics/server/server
-          cd electron
           npm install
           npm run postinstall
           npm run build
@@ -151,7 +149,6 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           chmod +x statics/server/server
-          cd electron
           npm install
           npm run postinstall
           npm run build

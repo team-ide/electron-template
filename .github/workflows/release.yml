@@ -12,10 +12,14 @@ jobs:
   buildStatic:
     runs-on: ubuntu-latest
     steps:
+      # 下载源码
+      - name: Checkout code
+        uses: actions/checkout@v2
+
       # 创建 temp 相关目录
       - run: |
           mkdir temp
-          
+
           cp -rf RELEASE.md temp/
           cp -rf README.md temp/
           cp -rf CHANGELOG.md temp/CHANGELOG.md

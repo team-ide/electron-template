@@ -3,6 +3,7 @@ import path from 'path';
 import { app, BrowserWindow, shell, Menu, screen } from 'electron';
 import config from './config';
 import { startServer } from './server';
+import log from 'electron-log';
 
 let serverUrl = resolveHtmlPath('index.html')
 
@@ -10,7 +11,7 @@ export let mainWindow: BrowserWindow | null = null;
 
 
 if (options.isDebug) {
-    require('electron-debug')();
+    // require('electron-debug')();
 }
 const installExtensions = async () => {
     const installer = require('electron-devtools-installer');
@@ -22,14 +23,43 @@ const installExtensions = async () => {
             extensions.map((name) => installer[name]),
             forceDownload
         )
-        .catch(console.log);
+        .catch(log.info);
 };
+
+export const onServerStart = (url: string) => {
+    log.info("onServerStart to url:", url)
+    if (url == null || url == "") {
+        return
+    }
+    if (mainWindow != null && !mainWindow.isDestroyed()) {
+        log.info("onServerStart to url:", url)
+        mainWindow.loadURL(url);
+    }
+}
+
+export const onServerStop = () => {
+    if (mainWindow != null && !mainWindow.isDestroyed()) {
+        let url = resolveHtmlPath('index.html')
+        log.info("onServerStop to url:", url)
+        mainWindow.loadURL(url);
+    }
+}
+export const refreshMainWindow = () => {
+    if (mainWindow != null && !mainWindow.isDestroyed()) {
+        log.info("refresh main window")
+        mainWindow.reload()
+    }
+}
+var mainWindowReadyde = false
 
 export const startMainWindow = async () => {
     if (mainWindow != null && !mainWindow.isDestroyed()) {
         mainWindow.show()
         return
     }
+    // if (options.isDebug) {
+    //     installExtensions();
+    // }
 
     //获取到屏幕的宽度和高度
     const workAreaSize = screen.getPrimaryDisplay().workAreaSize
@@ -62,18 +92,19 @@ export const startMainWindow = async () => {
     mainWindow.loadURL(serverUrl);
 
     mainWindow.on('ready-to-show', () => {
+        if (mainWindowReadyde) {
+            return
+        }
         if (!mainWindow) {
             throw new Error('"mainWindow" is not defined');
         }
+        mainWindowReadyde = true
         if (config.openStartMinimized) {
             allWindowHide()
         } else {
             mainWindow.show();
         }
         startServer()
-        if (options.isDebug) {
-            installExtensions();
-        }
     });
 
     mainWindow.on('close', (e) => {

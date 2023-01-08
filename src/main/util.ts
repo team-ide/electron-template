@@ -38,6 +38,7 @@ export const options = {
   screenHeight: 900,
   windowWidth: 1440,
   windowHeight: 900,
+  rootDir: getRootPath("./"),
   isDebug: process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true',
   isDarwin: process.platform === 'darwin',
   isWindows: process.platform === 'win32',

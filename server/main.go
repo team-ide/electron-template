@@ -44,10 +44,9 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("Server Url:", serverUrl)
 
 	if *isElectron == "1" {
-		_, _ = os.Stdout.Write([]byte("TeamIDE:event:serverUrl:" + serverUrl))
+		_, _ = os.Stdout.Write([]byte("event:serverUrl:" + serverUrl))
 		go func() {
 			var buf = make([]byte, 1024)
 			var err error
@@ -58,6 +57,10 @@ func main() {
 						err = nil
 					}
 					break
+				}
+				if strings.HasPrefix(string(buf), "event:call:stop") {
+					waitGroupForStop.Done()
+					return
 				}
 			}
 			if err == nil {

@@ -8,18 +8,14 @@
  * When running `npm run build` or `npm run build:main`, this file is compiled to
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
-import { app, ipcMain, Menu, Tray } from 'electron';
+import { app, Menu, Tray } from 'electron';
 import config from './config';
 import { options } from './util';
-import { startMainWindow, checkWindowHideOrShow, allWindowDestroy } from './window';
-import { stopServer } from './server';
+import { startMainWindow, checkWindowHideOrShow, allWindowDestroy, refreshMainWindow } from './window';
+import { stopServer, serverStatus, restartServer } from './server';
+import log from 'electron-log';
 
 
-ipcMain.on('ipc-example', async (event, arg) => {
-  const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
-  console.log(msgTemplate(arg));
-  event.reply('ipc-example', msgTemplate('pong'));
-});
 
 // if (process.env.NODE_ENV === 'production') {
 //   const sourceMapSupport = require('source-map-support');
@@ -58,7 +54,7 @@ app
       startMainWindow();
     });
   })
-  .catch(console.log);
+  .catch(log.info);
 
 let tray: Tray | null = null;
 app.on('ready', async () => {
@@ -67,14 +63,45 @@ app.on('ready', async () => {
   } else {
     tray = new Tray(options.icon64Path)
   }
-  const contextMenu = Menu.buildFromTemplate([
+
+  let menus = [];
+
+  menus.push(
+    {
+      label: '刷新',
+      click: function () {
+        refreshMainWindow()
+      }
+    }
+  )
+  if (serverStatus.hasServer) {
+    menus.push(
+      {
+        label: '关闭服务',
+        click: function () {
+          stopServer()
+        }
+      }
+    )
+    menus.push(
+      {
+        label: '重启服务',
+        click: function () {
+          restartServer()
+        }
+      }
+    )
+  }
+  menus.push(
     {
       label: '退出',
       click: function () {
         destroyAll()
       }
     }
-  ])
+  )
+
+  const contextMenu = Menu.buildFromTemplate(menus)
   tray.setToolTip(config.tray.toolTip)
   if (process.platform === `darwin`) {
     //显示程序页面
@@ -93,25 +120,25 @@ let destroyAll = () => {
   try {
     allWindowDestroy()
   } catch (error) {
-    console.log(error)
+    log.info(error)
   }
   try {
     stopServer()
   } catch (error) {
-    console.log(error)
+    log.info(error)
   }
   try {
     if (tray != null) {
       tray.destroy()
     }
   } catch (error) {
-    console.log(error)
+    log.info(error)
   }
   try {
     if (app != null) {
       app.quit()
     }
   } catch (error) {
-    console.log(error)
+    log.info(error)
   }
 }

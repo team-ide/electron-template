@@ -76,7 +76,7 @@ jobs:
           npm install
           npm run postinstall
           npm run build
-          npm exec electron-builder -- --mac –publish=always
+          npm exec electron-builder -- --mac -p always
       - run: |
           mv release/build/ElectronServerDemo-mac-${{ steps.release_version.outputs.value }}.dmg temp/
 
@@ -132,7 +132,7 @@ jobs:
           npm install
           npm run postinstall
           npm run build
-          npm exec electron-builder -- --linux –publish=always
+          npm exec electron-builder -- --linux -p always
       - run: |
           mv release/build/ElectronServerDemo-linux-x64-${{ steps.release_version.outputs.value }}.AppImage temp/
 
@@ -191,7 +191,7 @@ jobs:
           npm install
           npm run postinstall
           npm run build
-          npm exec electron-builder -- --win –publish=always
+          npm exec electron-builder -- --win -p always
       - run: |
           move release/build/ElectronServerDemo-windows-x64-${{ steps.release_version.outputs.value }}.exe temp/ElectronServerDemo-windows-x64-${{ steps.release_version.outputs.value }}.exe
 

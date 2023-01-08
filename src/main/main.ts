@@ -8,11 +8,13 @@
  * When running `npm run build` or `npm run build:main`, this file is compiled to
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
-import { app, Menu, Tray } from 'electron';
+import { app, Menu, Tray, MenuItem } from 'electron';
 import config from './config';
 import { options } from './util';
 import { startMainWindow, checkWindowHideOrShow, allWindowDestroy, refreshMainWindow } from './window';
-import { stopServer, serverStatus, restartServer } from './server';
+import { stopServer, restartServer } from './server';
+import { toAppUpdater } from './updater';
+
 import log from 'electron-log';
 
 
@@ -56,52 +58,101 @@ app
   })
   .catch(log.info);
 
-let tray: Tray | null = null;
+
+export let tray: Tray | null = null;
+
+export const appMenu: any = {
+  refreshMenu: {
+    id: "refreshMenu",
+    label: '刷新',
+    visible: true,
+    enabled: true,
+    click: function () {
+      refreshMainWindow()
+    },
+  },
+  stopServerMenu: {
+    id: "stopServerMenu",
+    label: '关闭服务',
+    visible: false,
+    enabled: true,
+    click: function () {
+      stopServer()
+    },
+  },
+  startServerMenu: {
+    id: "startServerMenu",
+    label: '启动服务',
+    visible: false,
+    enabled: true,
+    click: function () {
+      restartServer()
+    },
+  },
+  restartServerMenu: {
+    id: "restartServerMenu",
+    label: '重启服务',
+    visible: false,
+    enabled: true,
+    click: function () {
+      restartServer()
+    },
+  },
+  updaterMenu: {
+    id: "updaterMenu",
+    label: '检查更新',
+    visible: true,
+    enabled: true,
+    click: function () {
+      toAppUpdater()
+    },
+  },
+  quitMenu: {
+    id: "quitMenu",
+    label: '退出',
+    visible: true,
+    enabled: true,
+    click: function () {
+      destroyAll()
+    },
+  },
+}
+
+let trayImage: string = ""
+if (process.platform === 'darwin') {
+  trayImage = (options.icon16Path)
+} else {
+  trayImage = (options.icon64Path)
+}
+
+let menus = [];
+menus.push(appMenu.refreshMenu)
+menus.push(appMenu.startServerMenu)
+menus.push(appMenu.stopServerMenu)
+menus.push(appMenu.restartServerMenu)
+menus.push(appMenu.updaterMenu)
+menus.push(appMenu.quitMenu)
+
+export const contextMenu = Menu.buildFromTemplate(menus)
+
+export const getMenuItemById = (id: string): MenuItem | null => {
+  if (contextMenu == null) {
+    return null
+  }
+  let find = null
+  contextMenu.items.forEach((one) => {
+    if (one.id == id) {
+      find = one
+    }
+  })
+  return find
+}
+
+
+
 app.on('ready', async () => {
-  if (process.platform === 'darwin') {
-    tray = new Tray(options.icon16Path)
-  } else {
-    tray = new Tray(options.icon64Path)
-  }
+  tray = new Tray(trayImage)
 
-  let menus = [];
-
-  menus.push(
-    {
-      label: '刷新',
-      click: function () {
-        refreshMainWindow()
-      }
-    }
-  )
-  if (serverStatus.hasServer) {
-    menus.push(
-      {
-        label: '关闭服务',
-        click: function () {
-          stopServer()
-        }
-      }
-    )
-    menus.push(
-      {
-        label: '重启服务',
-        click: function () {
-          restartServer()
-        }
-      }
-    )
-  }
-  menus.push(
-    {
-      label: '退出',
-      click: function () {
-        destroyAll()
-      }
-    }
-  )
-
-  const contextMenu = Menu.buildFromTemplate(menus)
   tray.setToolTip(config.tray.toolTip)
   if (process.platform === `darwin`) {
     //显示程序页面
@@ -110,7 +161,10 @@ app.on('ready', async () => {
     //显示程序页面
     tray.on('click', checkWindowHideOrShow)
   }
+
+
   tray.setContextMenu(contextMenu)
+
 })
 
 

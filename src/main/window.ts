@@ -26,13 +26,13 @@ const installExtensions = async () => {
         .catch(log.info);
 };
 
-export const onServerStart = (url: string) => {
-    log.info("onServerStart to url:", url)
+export const onFindServerUrl = (url: string) => {
+    log.info("onFindServerUrl to url:", url)
     if (url == null || url == "") {
         return
     }
     if (mainWindow != null && !mainWindow.isDestroyed()) {
-        log.info("onServerStart to url:", url)
+        log.info("onFindServerUrl to url:", url)
         mainWindow.loadURL(url);
     }
 }

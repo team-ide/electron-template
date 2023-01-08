@@ -11,7 +11,7 @@ class App extends React.Component {
     value: 'name',
     isStopped: true,
     error: "",
-    statting: false,
+    isStarting: false,
     checkTime: new Date(),
     serverStatus: null,
   }
@@ -32,7 +32,7 @@ class App extends React.Component {
         this.setState({
           isStopped: args[1].isStopped,
           error: args[1].error,
-          statting: args[1].statting,
+          isStarting: args[1].isStarting,
           checkTime: new Date(),
           serverStatus: args[1],
         })
@@ -72,7 +72,7 @@ class App extends React.Component {
         {
           this.state.isStopped ?
             (
-              this.state.statting ?
+              this.state.isStarting ?
                 (
                   <div className="app-system-message-info">
                     服务启动中，请稍后~~~

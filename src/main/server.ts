@@ -1,8 +1,9 @@
 
-import { ipcMain } from 'electron';
+import { ipcMain, MenuItem } from 'electron';
 import config from './config';
 import { getRootPath, options } from './util';
-import { onServerStart, onServerStop } from './window';
+import { getMenuItemById } from './main';
+import { onFindServerUrl, onServerStop } from './window';
 import { spawn, ChildProcess } from 'child_process';
 import log from 'electron-log';
 
@@ -41,27 +42,75 @@ if (options.isWindows) {
 export const serverStatus = {
     isStopped: true,
     error: "",
-    statting: true,
+    isStarting: true,
     hasServer: serverConfig != null && serverConfig.exec != null && serverConfig.exec != "",
 }
 
+let onServerClosed: any = null
+
 
 export const restartServer = () => {
-    stopServer()
-    startServer()
+    if (serverProcessor != null) {
+        onServerClosed = () => {
+            startServer()
+        }
+        stopServer()
+    } else {
+        stopServer()
+        startServer()
+    }
+}
+
+const onServerStarted = () => {
+    serverStatus.isStopped = false
+}
+const onServerStoped = () => {
+    serverStatus.isStopped = true
+    serverStatus.isStarting = false
+    if (options.isStopped) {
+        serverStatus.error = ""
+        log.info(`server is stopped`);
+    } else {
+        log.info("onServerStop");
+        onServerStop()
+        let onC = onServerClosed
+        onServerClosed = null
+        if (onC != null) {
+            onC()
+        }
+    }
+}
+const onServerError = (data: any) => {
+    serverStatus.isStopped = true
+    serverStatus.isStarting = false
+    serverStatus.error = data.toString()
+    log.error(`server start error:`, data.toString());
 }
 
 export const startServer = () => {
     log.info("server start")
     serverStatus.error = ""
     serverStatus.isStopped = true
-    serverStatus.statting = true
+    serverStatus.isStarting = true
     try {
         if (serverProcessor != null) {
             return
         } else if (config.server == null) {
             log.info("没有服务配置")
             return
+        }
+        let menuItem: MenuItem | null
+        menuItem = getMenuItemById("startServerMenu")
+        if (menuItem) {
+            menuItem.visible = true
+        }
+        menuItem = getMenuItemById("stopServerMenu")
+        if (menuItem) {
+            menuItem.visible = true
+        }
+        menuItem = getMenuItemById("restartServerMenu")
+        if (menuItem) {
+            menuItem.visible = true
         }
 
         log.info("server config:", config.server)
@@ -104,10 +153,9 @@ export const startServer = () => {
             cmdOptions,
         );
         if (serverProcessor.stdout == null) {
-            serverStatus.error = "服务启动失败"
-            serverStatus.isStopped = true
+            onServerError("服务启动失败")
         } else {
-            serverStatus.isStopped = false
+            onServerStarted()
         }
         if (serverProcessor.stdout != null) {
             serverProcessor.stdout.on('data', (data: any) => {
@@ -118,8 +166,8 @@ export const startServer = () => {
                 log.info("server processor stdout:", msg);
                 if (msg.startsWith("event:serverUrl:")) {
                     let serverUrl = msg.substring("event:serverUrl:".length)
-                    log.info("onServerStart:", serverUrl);
-                    onServerStart(serverUrl)
+                    log.info("onFindServerUrl:", serverUrl);
+                    onFindServerUrl(serverUrl)
                     return
                 }
             });
@@ -127,36 +175,22 @@ export const startServer = () => {
         if (serverProcessor.stderr != null) {
             serverProcessor.stderr.on('data', (data: any) => {
                 serverStatus.error = data.toString()
-                log.info('server processor stderr:', data.toString());
+                log.error('server processor stderr:', data.toString());
             });
         }
         serverProcessor.on('close', (code: any) => {
             serverProcessor = null;
-            serverStatus.isStopped = true
-            serverStatus.statting = false
             log.info(`server process close: ${code}`);
-            if (options.isStopped) {
-                serverStatus.error = ""
-                log.info(`server is stopped`);
-            } else {
-                log.error(`server process closed: ${code}`);
-                log.info("onServerStop");
-                onServerStop()
-            }
+            onServerStoped()
         });
         serverProcessor.on('error', (data: any) => {
             serverProcessor = null;
-            serverStatus.isStopped = true
-            serverStatus.statting = false
-            serverStatus.error = data.toString()
-            log.error(`server start error`, data.toString());
+            onServerError(data)
         });
     } catch (error: any) {
-        serverStatus.isStopped = true
-        serverStatus.error = error.toString()
-        log.error(`server start error`, error.toString());
+        onServerError(error)
     } finally {
-        serverStatus.statting = false
+        serverStatus.isStarting = false
         log.info("server start end")
     }
 
@@ -172,8 +206,7 @@ export const stopServer = () => {
             serverProcessor.stdin.write("event:call:stop")
         }
     } catch (error) {
-        log.info("server call stop error,", error)
+        log.error("server call stop error,", error)
     }
     serverProcessor.kill()
-    serverProcessor = null;
 }

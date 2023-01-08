@@ -113,7 +113,6 @@ jobs:
           path: temp
 
   buildWindow:
-    needs: buildStatic
     runs-on: windows-latest
     steps:
       # 下载源码

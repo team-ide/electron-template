@@ -16,20 +16,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # 创建 temp 相关目录
-      - run: |
-          mkdir temp
-
-          cp -rf RELEASE.md temp/
-          cp -rf README.md temp/
-          cp -rf CHANGELOG.md temp/CHANGELOG.md
-
-      # 上传共享资源
-      - uses: actions/upload-artifact@v2
-        with:
-          name: temp
-          path: temp
-
       # 读取发布版本
       - name: Read Release Version
         id: release_version
@@ -81,12 +67,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # 下载共享资源
-      - uses: actions/download-artifact@v2
-        with:
-          name: temp
-          path: temp
-
       # 读取发布版本
       - name: Read Release Version
         id: release_version
@@ -120,14 +100,6 @@ jobs:
           npm run postinstall
           npm run build
           npm exec electron-builder -- --mac -p always
-      - run: |
-          mv release/build/ElectronServerDemo-mac-${{ steps.release_version.outputs.value }}.dmg temp/
-
-      # 上传共享资源
-      - uses: actions/upload-artifact@v2
-        with:
-          name: temp
-          path: temp
 
   buildLinux:
     needs: buildStatic
@@ -136,12 +108,6 @@ jobs:
       # 下载源码
       - name: Checkout code
         uses: actions/checkout@v2
-
-      # 下载共享资源
-      - uses: actions/download-artifact@v2
-        with:
-          name: temp
-          path: temp
 
       # 读取发布版本
       - name: Read Release Version
@@ -176,14 +142,6 @@ jobs:
           npm run postinstall
           npm run build
           npm exec electron-builder -- --linux -p always
-      - run: |
-          mv release/build/ElectronServerDemo-linux-x64-${{ steps.release_version.outputs.value }}.AppImage temp/
-
-      # 上传共享资源
-      - uses: actions/upload-artifact@v2
-        with:
-          name: temp
-          path: temp
 
   buildWindow:
     needs: buildStatic
@@ -192,12 +150,6 @@ jobs:
       # 下载源码
       - name: Checkout code
         uses: actions/checkout@v2
-
-      # 下载共享资源
-      - uses: actions/download-artifact@v2
-        with:
-          name: temp
-          path: temp
 
       # 读取发布版本
       - name: Read Release Version
@@ -235,11 +187,3 @@ jobs:
           npm run postinstall
           npm run build
           npm exec electron-builder -- --win -p always
-      - run: |
-          move release/build/ElectronServerDemo-windows-x64-${{ steps.release_version.outputs.value }}.exe temp/ElectronServerDemo-windows-x64-${{ steps.release_version.outputs.value }}.exe
-
-      # 上传共享资源
-      - uses: actions/upload-artifact@v2
-        with:
-          name: temp
-          path: temp

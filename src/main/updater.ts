@@ -9,13 +9,15 @@ export const toAppUpdater = async () => {
   let updaterMenu: MenuItem | null
   updaterMenu = getMenuItemById("updaterMenu")
   autoUpdater.logger = log;
+  // 允许 没有签名验证 的 Web安装程序文件 
+  autoUpdater.disableWebInstaller = false
   //更新错误事件
   autoUpdater.on('error', function (error) {
     if (updaterMenu) {
       updaterMenu.label = "更新异常,点击重试"
       updaterMenu.enabled = true
     }
-    log.info('autoUpdater error', error)
+    log.error('autoUpdater on error', error)
   });
 
   //检查事件
@@ -24,7 +26,7 @@ export const toAppUpdater = async () => {
       updaterMenu.label = "更新检查中..."
       updaterMenu.enabled = false
     }
-    log.info('autoUpdater checking-for-update')
+    log.info('autoUpdater on checking-for-update')
   });
 
   //发现新版本
@@ -33,7 +35,7 @@ export const toAppUpdater = async () => {
       updaterMenu.label = "发现新版本"
       updaterMenu.enabled = false
     }
-    log.info('autoUpdater update-available')
+    log.info('autoUpdater on update-available')
   });
 
   //当前版本为最新版本
@@ -42,7 +44,7 @@ export const toAppUpdater = async () => {
       updaterMenu.label = "当前为最新版本"
       updaterMenu.enabled = false
     }
-    log.info('autoUpdater update-not-available')
+    log.info('autoUpdater on update-not-available')
   });
 
   //更新下载进度事件
@@ -51,7 +53,7 @@ export const toAppUpdater = async () => {
       updaterMenu.label = "正在下载"
       updaterMenu.enabled = false
     }
-    log.info('autoUpdater download-progress', progressObj)
+    log.info('autoUpdater on download-progress', progressObj)
   });
 
 
@@ -61,7 +63,7 @@ export const toAppUpdater = async () => {
       updaterMenu.label = "下载完成"
       updaterMenu.enabled = false
     }
-    log.info('autoUpdater update-downloaded')
+    log.info('autoUpdater on update-downloaded')
   });
 
   //更新已取消
@@ -70,7 +72,7 @@ export const toAppUpdater = async () => {
       updaterMenu.label = "更新已取消"
       updaterMenu.enabled = true
     }
-    log.info('autoUpdater update-cancelled')
+    log.info('autoUpdater on update-cancelled')
   });
 
   //更新完成
@@ -79,7 +81,7 @@ export const toAppUpdater = async () => {
       updaterMenu.label = "更新完成"
       updaterMenu.enabled = true
     }
-    log.info('autoUpdater update-cancelled')
+    log.info('autoUpdater on update-cancelled')
   });
   try {
     let res = await autoUpdater.checkForUpdatesAndNotify()

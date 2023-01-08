@@ -30,6 +30,49 @@ jobs:
           name: temp
           path: temp
 
+      # 读取发布版本
+      - name: Read Release Version
+        id: release_version
+        uses: ashley-taylor/read-json-property-action@v1.0
+        with:
+          path: release/app/package.json
+          property: version
+
+      - id: release_check
+        run: |
+          echo "::set-output name=RELEASE_STATUS::$(curl -I -m 10 -o /dev/null -s -w %{http_code} https://github.com/team-ide/electron-server-demo/releases/tag/${{ steps.release_version.outputs.value }})"
+
+      #      - if: ${{ steps.release_check.outputs.RELEASE_STATUS == 404 }}
+      #        run: cd release && zip -q -r teamide-linux-x64.zip teamide-linux-x64
+      #      - if: ${{ steps.release_check.outputs.RELEASE_STATUS == 404 }}
+      #        run: cd release && zip -q -r teamide-server-linux-x64.zip teamide-server-linux-x64
+      #      - if: ${{ steps.release_check.outputs.RELEASE_STATUS == 404 }}
+      #        run: cd release && zip -q -r teamide-darwin-x64.zip teamide-darwin-x64
+      #      - if: ${{ steps.release_check.outputs.RELEASE_STATUS == 404 }}
+      #        run: cd release && zip -q -r teamide-windows-x64.zip teamide-windows-x64
+
+      # 读取发布说明
+      - name: Read Release Description
+        id: release_body
+        if: ${{ steps.release_check.outputs.RELEASE_STATUS == 404 }}
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: RELEASE.md
+
+      # 发布
+      - name: Create Release
+        id: create_release
+        if: ${{ steps.release_check.outputs.RELEASE_STATUS == 404 }}
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{steps.release_version.outputs.value}}
+          release_name: ${{steps.release_version.outputs.value}}
+          body: ${{steps.release_body.outputs.content}}
+          draft: false # 是否是草稿
+          prerelease: false # 是否是预发布
+
   buildMAC:
     needs: buildStatic
     runs-on: macos-latest
@@ -200,102 +243,3 @@ jobs:
         with:
           name: temp
           path: temp
-
-  release:
-    needs:
-      - buildMAC
-      - buildLinux
-      - buildWindow
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [macos-latest]
-    steps:
-      - name: Checkout git repo
-        uses: actions/checkout@v1
-
-      - name: Install Node and NPM
-        uses: actions/setup-node@v1
-        with:
-          node-version: 16
-          cache: npm
-
-      # 下载共享资源
-      - uses: actions/download-artifact@v2
-        with:
-          name: temp
-          path: temp
-
-      # 读取发布版本
-      - name: Read Release Version
-        id: release_version
-        uses: ashley-taylor/read-json-property-action@v1.0
-        with:
-          path: release/app/package.json
-          property: version
-
-      - id: release_check
-        run: |
-          echo "::set-output name=RELEASE_STATUS::$(curl -I -m 10 -o /dev/null -s -w %{http_code} https://github.com/team-ide/electron-server-demo/releases/tag/v${{ steps.release_version.outputs.value }})"
-
-      #      - if: ${{ steps.release_check.outputs.RELEASE_STATUS == 404 }}
-      #        run: cd release && zip -q -r teamide-linux-x64.zip teamide-linux-x64
-      #      - if: ${{ steps.release_check.outputs.RELEASE_STATUS == 404 }}
-      #        run: cd release && zip -q -r teamide-server-linux-x64.zip teamide-server-linux-x64
-      #      - if: ${{ steps.release_check.outputs.RELEASE_STATUS == 404 }}
-      #        run: cd release && zip -q -r teamide-darwin-x64.zip teamide-darwin-x64
-      #      - if: ${{ steps.release_check.outputs.RELEASE_STATUS == 404 }}
-      #        run: cd release && zip -q -r teamide-windows-x64.zip teamide-windows-x64
-
-      # 读取发布说明
-      - name: Read Release Description
-        id: release_body
-        if: ${{ steps.release_check.outputs.RELEASE_STATUS == 404 }}
-        uses: juliangruber/read-file-action@v1
-        with:
-          path: RELEASE.md
-
-      # 发布
-      - name: Create Release
-        id: create_release
-        if: ${{ steps.release_check.outputs.RELEASE_STATUS == 404 }}
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: v${{steps.release_version.outputs.value}}
-          release_name: v${{steps.release_version.outputs.value}}
-          body: ${{steps.release_body.outputs.content}}
-          draft: false # 是否是草稿
-          prerelease: false # 是否是预发布
-
-      # 上传 到 Release
-      - if: ${{ steps.release_check.outputs.RELEASE_STATUS == 404 }}
-        uses: actions/upload-release-asset@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }} # 上传地址，通过创建Release获取到的
-          asset_path: temp/ElectronServerDemo-windows-x64-${{ steps.release_version.outputs.value }}.exe
-          asset_name: ElectronServerDemo-windows-x64-${{ steps.release_version.outputs.value }}.exe # 上传后的文件名
-          asset_content_type: application/zip
-
-      - if: ${{ steps.release_check.outputs.RELEASE_STATUS == 404 }}
-        uses: actions/upload-release-asset@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }} # 上传地址，通过创建Release获取到的
-          asset_path: temp/ElectronServerDemo-mac-${{ steps.release_version.outputs.value }}.dmg
-          asset_name: ElectronServerDemo-mac-${{ steps.release_version.outputs.value }}.dmg # 上传后的文件名
-          asset_content_type: application/zip
-
-      - if: ${{ steps.release_check.outputs.RELEASE_STATUS == 404 }}
-        uses: actions/upload-release-asset@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }} # 上传地址，通过创建Release获取到的
-          asset_path: temp/ElectronServerDemo-linux-x64-${{ steps.release_version.outputs.value }}.AppImage
-          asset_name: ElectronServerDemo-linux-x64-${{ steps.release_version.outputs.value }}.AppImage # 上传后的文件名
-          asset_content_type: application/zip

@@ -84,7 +84,7 @@ jobs:
       # 将静态资源打包html.go
       - run: |
           cd server
-          go build -ldflags="-w -s -X server.version=${{ steps.release_version.outputs.value }}" -o ../statics/server/server .
+          go build -ldflags="-w -s -X main.version=${{ steps.release_version.outputs.value }}" -o ../statics/server/server .
 
       - name: Install Node and NPM
         uses: actions/setup-node@v1
@@ -126,7 +126,7 @@ jobs:
       # 将静态资源打包html.go
       - run: |
           cd server
-          go build -ldflags="-w -s -X server.version=${{ steps.release_version.outputs.value }}" -o ../statics/server/server .
+          go build -ldflags="-w -s -X main.version=${{ steps.release_version.outputs.value }}" -o ../statics/server/server .
 
       - name: Install Node and NPM
         uses: actions/setup-node@v1
@@ -169,7 +169,7 @@ jobs:
       # -H=windowsgui
       - run: |
           cd server
-          go build -ldflags="-w -s -X server.version=${{ steps.release_version.outputs.value }}" -o ../statics/server/server.exe .
+          go build -ldflags="-w -s -X main.version=${{ steps.release_version.outputs.value }}" -o ../statics/server/server.exe .
 
       - name: Install Node and NPM
         uses: actions/setup-node@v1

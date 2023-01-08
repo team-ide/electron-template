@@ -38,6 +38,13 @@ func GetVersion() string {
 }
 
 func main() {
+	for _, v := range os.Args {
+		if v == "-version" || v == "-v" {
+			println(GetVersion())
+			return
+		}
+	}
+
 	flagParse()
 
 	var waitGroupForStop sync.WaitGroup

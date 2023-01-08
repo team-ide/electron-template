@@ -31,7 +31,7 @@ export const toAppUpdater = async () => {
   autoUpdater.on('update-available', function () {
     if (updaterMenu) {
       updaterMenu.label = "发现新版本"
-      updaterMenu.enabled = true
+      updaterMenu.enabled = false
     }
     log.info('autoUpdater update-available')
   });
@@ -40,7 +40,7 @@ export const toAppUpdater = async () => {
   autoUpdater.on('update-not-available', function () {
     if (updaterMenu) {
       updaterMenu.label = "当前为最新版本"
-      updaterMenu.enabled = true
+      updaterMenu.enabled = false
     }
     log.info('autoUpdater update-not-available')
   });
@@ -49,7 +49,7 @@ export const toAppUpdater = async () => {
   autoUpdater.on('download-progress', function (progressObj) {
     if (updaterMenu) {
       updaterMenu.label = "正在下载"
-      updaterMenu.enabled = true
+      updaterMenu.enabled = false
     }
     log.info('autoUpdater download-progress', progressObj)
   });
@@ -59,7 +59,7 @@ export const toAppUpdater = async () => {
   autoUpdater.on('update-downloaded', function () {
     if (updaterMenu) {
       updaterMenu.label = "下载完成"
-      updaterMenu.enabled = true
+      updaterMenu.enabled = false
     }
     log.info('autoUpdater update-downloaded')
   });

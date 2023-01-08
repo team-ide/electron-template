@@ -17,7 +17,8 @@ import { toAppUpdater } from './updater';
 
 import log from 'electron-log';
 
-
+// 忽略https证书相关错误，加在electron相关js文件里，有app的地方
+app.commandLine.appendSwitch('ignore-certificate-errors')
 
 // if (process.env.NODE_ENV === 'production') {
 //   const sourceMapSupport = require('source-map-support');

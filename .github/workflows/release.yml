@@ -9,12 +9,36 @@ on:
     # package.json 更改后再触发发布
     # paths: [ "package.json" ]
 jobs:
+  buildStatic:
+    runs-on: ubuntu-latest
+    steps:
+      # 创建 temp 相关目录
+      - run: |
+          mkdir temp
+          
+          cp -rf RELEASE.md temp/
+          cp -rf README.md temp/
+          cp -rf CHANGELOG.md temp/CHANGELOG.md
+
+      # 上传共享资源
+      - uses: actions/upload-artifact@v2
+        with:
+          name: temp
+          path: temp
+
   buildMAC:
+    needs: buildStatic
     runs-on: macos-latest
     steps:
       # 下载源码
       - name: Checkout code
         uses: actions/checkout@v2
+
+      # 下载共享资源
+      - uses: actions/download-artifact@v2
+        with:
+          name: temp
+          path: temp
 
       # 读取发布版本
       - name: Read Release Version
@@ -50,7 +74,6 @@ jobs:
           npm run build
           npm exec electron-builder -- --mac
       - run: |
-          mkdir -p temp
           mv release/build/ElectronServerDemo-mac-${{ steps.release_version.outputs.value }}.dmg temp/
 
       # 上传共享资源
@@ -60,12 +83,18 @@ jobs:
           path: temp
 
   buildLinux:
+    needs: buildStatic
     runs-on: ubuntu-latest
-    container: docker.io/teamide/build:0.6
     steps:
       # 下载源码
       - name: Checkout code
         uses: actions/checkout@v2
+
+      # 下载共享资源
+      - uses: actions/download-artifact@v2
+        with:
+          name: temp
+          path: temp
 
       # 读取发布版本
       - name: Read Release Version
@@ -101,7 +130,6 @@ jobs:
           npm run build
           npm exec electron-builder -- --linux
       - run: |
-          mkdir -p temp
           mv release/build/ElectronServerDemo-linux-x64-${{ steps.release_version.outputs.value }}.AppImage temp/
 
       # 上传共享资源
@@ -111,11 +139,18 @@ jobs:
           path: temp
 
   buildWindow:
+    needs: buildStatic
     runs-on: windows-latest
     steps:
       # 下载源码
       - name: Checkout code
         uses: actions/checkout@v2
+
+      # 下载共享资源
+      - uses: actions/download-artifact@v2
+        with:
+          name: temp
+          path: temp
 
       # 读取发布版本
       - name: Read Release Version
@@ -154,8 +189,7 @@ jobs:
           npm run build
           npm exec electron-builder -- --win
       - run: |
-          mkdir -p temp
-          mv release/build/ElectronServerDemo-windows-x64-${{ steps.release_version.outputs.value }}.exe temp/
+          move release/build/ElectronServerDemo-windows-x64-${{ steps.release_version.outputs.value }}.exe temp/ElectronServerDemo-windows-x64-${{ steps.release_version.outputs.value }}.exe
 
       # 上传共享资源
       - uses: actions/upload-artifact@v2

@@ -231,7 +231,6 @@
           ]
         }
       ],
-      "publisherName": "ZhuLiang",
       "extraResources": [
         "./assets/**",
         "./statics/**"

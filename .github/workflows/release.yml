@@ -56,7 +56,7 @@ jobs:
           tag_name: v${{steps.release_version.outputs.value}}
           release_name: ${{steps.release_version.outputs.value}}
           body: ${{steps.release_body.outputs.content}}
-          draft: false # 是否是草稿
+          draft: true # 是否是草稿
           prerelease: false # 是否是预发布
 
   buildMAC:

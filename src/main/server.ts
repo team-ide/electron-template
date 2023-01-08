@@ -103,7 +103,12 @@ export const startServer = () => {
             serverConfig.args || [],
             cmdOptions,
         );
-
+        if (serverProcessor.stdout == null) {
+            serverStatus.error = "服务启动失败"
+            serverStatus.isStopped = true
+        } else {
+            serverStatus.isStopped = false
+        }
         if (serverProcessor.stdout != null) {
             serverProcessor.stdout.on('data', (data: any) => {
                 if (data == null) {
@@ -125,7 +130,6 @@ export const startServer = () => {
                 log.info('server processor stderr:', data.toString());
             });
         }
-        serverStatus.isStopped = false
         serverProcessor.on('close', (code: any) => {
             serverProcessor = null;
             serverStatus.isStopped = true
@@ -140,8 +144,17 @@ export const startServer = () => {
                 onServerStop()
             }
         });
+        serverProcessor.on('error', (data: any) => {
+            serverProcessor = null;
+            serverStatus.isStopped = true
+            serverStatus.statting = false
+            serverStatus.error = data.toString()
+            log.error(`server start error`, data.toString());
+        });
     } catch (error: any) {
+        serverStatus.isStopped = true
         serverStatus.error = error.toString()
+        log.error(`server start error`, error.toString());
     } finally {
         serverStatus.statting = false
         log.info("server start end")

@@ -264,10 +264,6 @@
       "buildResources": "assets",
       "output": "release/build"
     },
-    "extraResources": [
-      "./assets/**",
-      "./statics/**"
-    ],
     "publish": {
       "provider": "github",
       "owner": "team-ide",

@@ -239,6 +239,7 @@
         }
       ],
       "publisherName": "ZhuLiang",
+      "verifyUpdateCodeSignature": false,
       "extraResources": [
         "./assets/**",
         "./statics/**"

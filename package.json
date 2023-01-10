@@ -223,6 +223,7 @@
     },
     "win": {
       "artifactName": "${productName}-win-${version}.${ext}",
+      "icon": "./assets/favicon.ico",
       "target": [
         {
           "target": "nsis",

@@ -5,11 +5,10 @@ import { getRootPath, options } from './util';
 import { getMenuItemById } from './main';
 import { onFindServerUrl, onServerStop } from './window';
 import { spawn, ChildProcess } from 'child_process';
+import { updaterStatus, updaterDownload, updaterQuitAndInstall } from './updater';
 import log from 'electron-log';
 
 let serverProcessor: ChildProcess | null = null
-
-
 
 ipcMain.on('ipc-example', async (event, arg) => {
     if (arg == 'server-status') {
@@ -26,6 +25,17 @@ ipcMain.on('ipc-example', async (event, arg) => {
     } else if (arg == 'server-restart') {
         restartServer()
         event.reply('ipc-example', ['server-restart', serverStatus]);
+        return
+    } else if (arg == 'updater-status') {
+        event.reply('ipc-example', ['updater-status', updaterStatus]);
+        return
+    } else if (arg == 'updater-download') {
+        updaterDownload()
+        event.reply('ipc-example', ['updater-status', updaterStatus]);
+        return
+    } else if (arg == 'updater-quit-and-install') {
+        updaterQuitAndInstall()
+        event.reply('ipc-example', ['updater-status', updaterStatus]);
         return
     }
 });

@@ -5,9 +5,12 @@ import config from './config';
 import { startServer } from './server';
 import log from 'electron-log';
 
-let serverUrl = resolveHtmlPath('index.html')
 
-export let mainWindow: BrowserWindow | null = null;
+export let getPageUrl = (): string => {
+    let pageUrl = resolveHtmlPath('index.html')
+    return pageUrl
+}
+
 
 
 if (options.isDebug) {
@@ -39,9 +42,14 @@ export const onFindServerUrl = (url: string) => {
 
 export const onServerStop = () => {
     if (mainWindow != null && !mainWindow.isDestroyed()) {
-        let url = resolveHtmlPath('index.html')
+        let url = getPageUrl()
         log.info("onServerStop to url:", url)
         mainWindow.loadURL(url);
+        setTimeout(() => {
+            if (mainWindow) {
+                mainWindow.webContents.send("ipc-example", ["to-page", '/server'])
+            }
+        }, 200)
     }
 }
 export const refreshMainWindow = () => {
@@ -52,6 +60,7 @@ export const refreshMainWindow = () => {
 }
 var mainWindowReadyde = false
 
+export let mainWindow: BrowserWindow | null = null;
 export const startMainWindow = async () => {
     if (mainWindow != null && !mainWindow.isDestroyed()) {
         mainWindow.show()
@@ -89,9 +98,13 @@ export const startMainWindow = async () => {
         },
     });
 
-    mainWindow.loadURL(serverUrl);
+    mainWindow.loadURL(getPageUrl());
 
     mainWindow.on('ready-to-show', () => {
+        log.info("main window ready-to-show")
+        if (mainWindow) {
+            mainWindow.webContents.send("ipc-example", ["to-page", '/server'])
+        }
         if (mainWindowReadyde) {
             return
         }
@@ -120,12 +133,6 @@ export const startMainWindow = async () => {
         }
     });
 
-    Menu.setApplicationMenu(null);
-    // Open urls in the user's browser
-    mainWindow.webContents.setWindowOpenHandler((edata) => {
-        shell.openExternal(edata.url);
-        return { action: 'deny' };
-    });
 };
 
 let viewWindowList: BrowserWindow[] = [];

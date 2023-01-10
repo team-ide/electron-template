@@ -170,7 +170,7 @@ app.on('ready', async () => {
 
 
 
-let destroyAll = () => {
+export const destroyAll = () => {
   options.isStopped = true
   try {
     allWindowDestroy()

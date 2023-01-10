@@ -26,16 +26,7 @@ jobs:
 
       - id: release_check
         run: |
-          echo "::set-output name=RELEASE_STATUS::$(curl -I -m 10 -o /dev/null -s -w %{http_code} https://github.com/team-ide/electron-server-demo/releases/tag/v${{ steps.release_version.outputs.value }})"
-
-      #      - if: ${{ steps.release_check.outputs.RELEASE_STATUS == 404 }}
-      #        run: cd release && zip -q -r teamide-linux-x64.zip teamide-linux-x64
-      #      - if: ${{ steps.release_check.outputs.RELEASE_STATUS == 404 }}
-      #        run: cd release && zip -q -r teamide-server-linux-x64.zip teamide-server-linux-x64
-      #      - if: ${{ steps.release_check.outputs.RELEASE_STATUS == 404 }}
-      #        run: cd release && zip -q -r teamide-darwin-x64.zip teamide-darwin-x64
-      #      - if: ${{ steps.release_check.outputs.RELEASE_STATUS == 404 }}
-      #        run: cd release && zip -q -r teamide-windows-x64.zip teamide-windows-x64
+          echo "::set-output name=RELEASE_STATUS::$(curl -I -m 10 -o /dev/null -s -w %{http_code} https://github.com/team-ide/electron-template/releases/tag/v${{ steps.release_version.outputs.value }})"
 
       # 读取发布说明
       - name: Read Release Description
@@ -84,7 +75,7 @@ jobs:
       # 将静态资源打包html.go
       - run: |
           cd server
-          go build -ldflags="-w -s -X main.version=${{ steps.release_version.outputs.value }}" -o ../statics/server/server .
+          go build -ldflags="-w -s -X main.version=${{ steps.release_version.outputs.value }}" -o ../assets/server/server .
 
       - name: Install Node and NPM
         uses: actions/setup-node@v1
@@ -95,7 +86,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          chmod +x statics/server/server
+          chmod +x assets/server/server
           npm install
           npm run postinstall
           npm run build
@@ -126,7 +117,7 @@ jobs:
       # 将静态资源打包html.go
       - run: |
           cd server
-          go build -ldflags="-w -s -X main.version=${{ steps.release_version.outputs.value }}" -o ../statics/server/server .
+          go build -ldflags="-w -s -X main.version=${{ steps.release_version.outputs.value }}" -o ../assets/server/server .
 
       - name: Install Node and NPM
         uses: actions/setup-node@v1
@@ -137,7 +128,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          chmod +x statics/server/server
+          chmod +x assets/server/server
           npm install
           npm run postinstall
           npm run build
@@ -169,7 +160,7 @@ jobs:
       # -H=windowsgui
       - run: |
           cd server
-          go build -ldflags="-w -s -X main.version=${{ steps.release_version.outputs.value }}" -o ../statics/server/server.exe .
+          go build -ldflags="-w -s -X main.version=${{ steps.release_version.outputs.value }}" -o ../assets/server/server.exe .
 
       - name: Install Node and NPM
         uses: actions/setup-node@v1
@@ -182,7 +173,7 @@ jobs:
           CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          chmod +x statics/server/server
+          chmod +x assets/server/server
           npm install
           npm run postinstall
           npm run build

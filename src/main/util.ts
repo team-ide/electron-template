@@ -43,8 +43,8 @@ export const options = {
   isDarwin: process.platform === 'darwin',
   isWindows: process.platform === 'win32',
   isLinux: process.platform === 'linux',
-  iconPath: getAssetPath('icon.png'),
-  icon16Path: getAssetPath('icon-16.png'),
-  icon32Path: getAssetPath('icon-32.png'),
-  icon64Path: getAssetPath('icon-64.png'),
+  iconPath: getAssetPath('icons/icon.png'),
+  icon16Path: getAssetPath('icons/icon-16.png'),
+  icon32Path: getAssetPath('icons/icon-32.png'),
+  icon64Path: getAssetPath('icons/icon-64.png'),
 } 

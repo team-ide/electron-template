@@ -1,11 +1,11 @@
 {
-  "homepage": "https://github.com/team-ide/electron-server-demo",
+  "homepage": "https://github.com/team-ide/electron-template",
   "bugs": {
-    "url": "https://github.com/team-ide/electron-server-demo/issues"
+    "url": "https://github.com/team-ide/electron-template/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/team-ide/electron-server-demo.git"
+    "url": "git+https://github.com/team-ide/electron-template.git"
   },
   "license": "MIT",
   "author": {
@@ -165,8 +165,8 @@
     "webpack-merge": "^5.8.0"
   },
   "build": {
-    "productName": "ElectronServerDemo",
-    "appId": "com.teamide.ElectronServerDemo",
+    "productName": "electron-template",
+    "appId": "com.teamide.electron-template",
     "asar": true,
     "asarUnpack": "**\\*.{node,dll}",
     "files": [
@@ -204,8 +204,7 @@
       "entitlementsInherit": "assets/entitlements.mac.plist",
       "gatekeeperAssess": false,
       "extraResources": [
-        "./assets/**",
-        "./statics/**"
+        "./assets/**"
       ]
     },
     "dmg": {
@@ -223,7 +222,7 @@
       ]
     },
     "win": {
-      "artifactName": "${productName}-windows-x64-${version}.${ext}",
+      "artifactName": "${productName}-win-${version}.${ext}",
       "target": [
         {
           "target": "nsis",
@@ -241,12 +240,11 @@
       "publisherName": "ZhuLiang",
       "verifyUpdateCodeSignature": false,
       "extraResources": [
-        "./assets/**",
-        "./statics/**"
+        "./assets/**"
       ]
     },
     "linux": {
-      "artifactName": "${productName}-linux-x64-${version}.${ext}",
+      "artifactName": "${productName}-linux-${version}.${ext}",
       "target": [
         {
           "target": "AppImage",
@@ -263,8 +261,7 @@
       ],
       "category": "Development",
       "extraResources": [
-        "./assets/**",
-        "./statics/**"
+        "./assets/**"
       ]
     },
     "directories": {
@@ -275,7 +272,7 @@
     "publish": {
       "provider": "github",
       "owner": "team-ide",
-      "repo": "electron-server-demo"
+      "repo": "electron-template"
     }
   },
   "collective": {

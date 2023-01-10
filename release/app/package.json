@@ -1,7 +1,7 @@
 {
-  "name": "electron-server-demo",
-  "version": "1.0.1",
-  "description": "electron server desktop apps",
+  "name": "electron-template",
+  "version": "1.0.0",
+  "description": "electron template desktop apps",
   "license": "MIT",
   "author": {
     "name": "朱亮",

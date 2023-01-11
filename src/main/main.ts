@@ -13,7 +13,7 @@ import config from './config';
 import { options } from './util';
 import { startMainWindow, checkWindowHideOrShow, allWindowDestroy, refreshMainWindow } from './window';
 import { stopServer, restartServer } from './server';
-import { toAppUpdater } from './updater';
+import { toAppUpdater, updaterDestroy } from './updater';
 
 import log from 'electron-log';
 
@@ -175,25 +175,31 @@ export const destroyAll = () => {
   try {
     allWindowDestroy()
   } catch (error) {
-    log.info(error)
+    log.error("all window error:", error)
   }
   try {
     stopServer()
   } catch (error) {
-    log.info(error)
+    log.error("stop server error:", error)
   }
   try {
     if (tray != null) {
       tray.destroy()
     }
   } catch (error) {
-    log.info(error)
+    log.error("tray destroy error:", error)
   }
+  try {
+    updaterDestroy()
+  } catch (error) {
+    log.error("updater destroy error:", error)
+  }
+
   try {
     if (app != null) {
       app.quit()
     }
   } catch (error) {
-    log.info(error)
+    log.error("app quit error:", error)
   }
 }

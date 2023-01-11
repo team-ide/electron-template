@@ -73,6 +73,7 @@ let onEnd = () => {
 }
 
 export const updaterDownload = () => {
+  updaterStatus.downloadStatus = 1
   autoUpdater.downloadUpdate()
 }
 

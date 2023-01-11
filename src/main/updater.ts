@@ -78,7 +78,7 @@ export const updaterDownload = () => {
 }
 
 export const updaterQuitAndInstall = () => {
-  if (updaterWindow != null && !updaterWindow.isDestroyed) {
+  if (updaterWindow != null && !updaterWindow.isDestroyed()) {
     updaterWindow.destroy()
   }
   // 加载更新程序
@@ -87,7 +87,7 @@ export const updaterQuitAndInstall = () => {
   destroyAll()
 }
 export const updaterDestroy = () => {
-  if (updaterWindow != null && !updaterWindow.isDestroyed) {
+  if (updaterWindow != null && !updaterWindow.isDestroyed()) {
     updaterWindow.destroy()
   }
 }
@@ -95,7 +95,12 @@ export const toAppUpdater = async () => {
   if (updaterDoing) {
     return
   }
+  if (updaterStatus.downloadStatus > 0) {
+    startUpdaterWindow()
+    return
+  }
   onStart()
+  updaterStatus.checking = true
   let updaterMenu: MenuItem | null
   updaterMenu = getMenuItemById("updaterMenu")
   autoUpdater.logger = log;
@@ -106,6 +111,7 @@ export const toAppUpdater = async () => {
   //更新错误事件
   autoUpdater.on('error', (error) => {
     updaterStatus.error = error.toString()
+    updaterStatus.downloadStatus = 0
     log.error('autoUpdater on error', error)
     onEnd()
   });

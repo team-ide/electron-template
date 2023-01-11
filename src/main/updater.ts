@@ -116,6 +116,7 @@ export const toAppUpdater = async () => {
     updaterStatus.checking = false
     updaterStatus.hasNew = true
     log.info('autoUpdater on update-available')
+    onEnd()
   });
 
   //当前版本为最新版本
@@ -123,6 +124,7 @@ export const toAppUpdater = async () => {
     updaterStatus.checking = false
     updaterStatus.hasNew = false
     log.info('autoUpdater on update-not-available')
+    onEnd()
   });
 
   //更新下载进度事件

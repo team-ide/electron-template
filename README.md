@@ -65,4 +65,5 @@ sed -i 's/"<publish>"/{"provider": "'$publishProvider'","owner": "'$publishOwner
 
 echo 'package.json info'
 cat $templateDir/package.json
+
 ```

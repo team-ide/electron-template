@@ -100,7 +100,6 @@ export const toAppUpdater = async () => {
     return
   }
   onStart()
-  updaterStatus.checking = true
   let updaterMenu: MenuItem | null
   updaterMenu = getMenuItemById("updaterMenu")
   autoUpdater.logger = log;

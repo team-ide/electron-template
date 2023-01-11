@@ -85,7 +85,11 @@ export const updaterQuitAndInstall = () => {
   // 关闭当前electron
   destroyAll()
 }
-
+export const updaterDestroy = () => {
+  if (updaterWindow != null && !updaterWindow.isDestroyed) {
+    updaterWindow.destroy()
+  }
+}
 export const toAppUpdater = async () => {
   if (updaterDoing) {
     return

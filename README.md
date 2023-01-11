@@ -4,32 +4,65 @@
 
 ## 使用说明
 
+
+参考 [electron-template-demo](https://github.com/team-ide/electron-template-demo)
+
 ```shell
 
-# 定义应用信息
-productName='yourProductName'
-version='1.0.0'
-publisherName='yourName'
+#!/bin/sh
+
+# 移至脚本目录
+cd `dirname $0`
+
+echo `pwd`
+
+templateDir=./electron-template
+# 安装 electron-template
+
+git clone https://github.com/team-ide/electron-template
+rm -rf $templateDir/.git
+
+# 复制 应用信息 package.json 到 release/app
+echo 'cp package.json'
+cp -rf package.json $templateDir/release/app/package.json
+
+echo 'app package.json info'
+cat $templateDir/release/app/package.json
+
+# 复制 应用配置 config.ts 到 src/main
+echo 'cp config.ts'
+cp -rf config.ts $templateDir/src/main/config.ts
+
+echo 'config.ts info'
+cat $templateDir/src/main/config.ts
+
+# 设置 应用 变量
+productName='ElectronTemplateDemo'
+publisherName='ZhuLiang'
 publishProvider='github'
-publishOwner='githubOwner'
-publishRepo='githubRepo'
+publishOwner='team-ide'
+publishRepo='electron-template-demo'
 
-# 写入应用信息
-echo '{
-  "name": "'$productName'",
-  "version": "'$version'",\
-  "main": "./dist/main/main.js"
-}' >  ./release/app/package.json
+echo 'set productName='$productName
+echo 'set publisherName='$publisherName
+echo 'set publishProvider='$publishProvider
+echo 'set publishOwner='$publishOwner
+echo 'set publishRepo='$publishRepo
 
-publish='{
-      "provider": "'$publishProvider'",
-      "owner": "'$publishOwner'",
-      "repo": "'$publishRepo'"
-    }
-'
 # 设置包相关信息
-sed -i 's/<productName>/'$productName'/g' ./package.json
-sed -i 's/<publisherName>/'$publisherName'/g' ./package.json
-sed -i 's/"<publish>"/'$publish'/g' ./package.json
 
+# 设置 项目名称
+echo 'replace productName'
+sed -i 's/<productName>/'$productName'/g' $templateDir/package.json
+
+# 设置 项目 发布者
+echo 'replace publisherName'
+sed -i 's/<publisherName>/'$publisherName'/g' $templateDir/package.json
+
+# 设置 项目 发布信息
+echo 'replace publish'
+sed -i 's/"<publish>"/{"provider": "'$publishProvider'","owner": "'$publishOwner'","repo": "'$publishRepo'"}/g' $templateDir/package.json
+
+echo 'package.json info'
+cat $templateDir/package.json
 ```

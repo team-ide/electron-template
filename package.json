@@ -165,8 +165,8 @@
     "webpack-merge": "^5.8.0"
   },
   "build": {
-    "productName": "electron-template",
-    "appId": "com.teamide.electron-template",
+    "productName": "<productName>",
+    "appId": "<appId>",
     "asar": true,
     "asarUnpack": "**\\*.{node,dll}",
     "files": [
@@ -238,7 +238,7 @@
           ]
         }
       ],
-      "publisherName": "ZhuLiang",
+      "publisherName": "<publisherName>",
       "verifyUpdateCodeSignature": false,
       "extraResources": [
         "./assets/**"
@@ -270,11 +270,7 @@
       "buildResources": "assets",
       "output": "release/build"
     },
-    "publish": {
-      "provider": "github",
-      "owner": "team-ide",
-      "repo": "electron-template"
-    }
+    "publish": "<publish>"
   },
   "collective": {
     "url": "https://github.com/team-ide"

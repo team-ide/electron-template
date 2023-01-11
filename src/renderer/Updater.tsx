@@ -23,6 +23,19 @@ export default class Updater extends React.Component {
     window.electron.ipcRenderer.once('ipc-example', (args: any) => {
       args = args || []
       if (args[0] == 'updater-status' && args[1]) {
+        let progress = args[1].progress;
+        if (progress == null) {
+          progress = {
+            bytesPerSecond: 0,
+            delta: 0,
+            percent: 0,
+            total: 0,
+            transferred: 0,
+          }
+        }
+        if (progress.percent > 0) {
+          progress.percent = progress.percent.toFixed(1)
+        }
         this.setState({
           checkTime: new Date(),
           checking: args[1].checking,
@@ -30,7 +43,7 @@ export default class Updater extends React.Component {
           hasNew: args[1].hasNew,
           downloadStatus: args[1].downloadStatus,
           cancelled: args[1].cancelled,
-          progress: args[1].progress,
+          progress: progress,
           updaterStatus: args[1],
         })
 

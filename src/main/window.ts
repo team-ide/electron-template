@@ -122,7 +122,7 @@ export const startMainWindow = async () => {
         if (config.openCloseWindowMinimize) {
             allWindowHide()
         } else {
-            if (mainWindow != null && !mainWindow.isDestroyed) {
+            if (mainWindow != null && !mainWindow.isDestroyed()) {
                 mainWindow.hide()
             }
         }

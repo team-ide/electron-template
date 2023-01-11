@@ -37,7 +37,7 @@ export const startUpdaterWindow = async () => {
     height: 300,
     icon: options.iconPath,
     autoHideMenuBar: true,
-    skipTaskbar: true,
+    // skipTaskbar: true,
     title: "检查更新",
     webPreferences: {
       preload: app.isPackaged
@@ -47,13 +47,12 @@ export const startUpdaterWindow = async () => {
   });
 
 
-  updaterWindow.loadURL(getPageUrl());
+  updaterWindow.loadURL(getPageUrl('/updater'));
 
   updaterWindow.on('ready-to-show', () => {
     if (!updaterWindow) {
       throw new Error('"updaterWindow" is not defined');
     }
-    updaterWindow.webContents.send("ipc-example", ["to-page", '/updater'])
   });
 
   updaterWindow.on('close', (e) => {

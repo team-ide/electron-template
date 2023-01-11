@@ -18,3 +18,13 @@ body {
   color: greenyellow;
   cursor: pointer;
 }
+
+.updater-download-btn {
+  color: rgb(5, 166, 230);
+  cursor: pointer;
+}
+
+.updater-quit-and-install-btn {
+  color: rgb(0, 108, 248);
+  cursor: pointer;
+}

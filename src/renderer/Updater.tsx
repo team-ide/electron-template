@@ -33,6 +33,7 @@ export default class Updater extends React.Component {
           progress: args[1].progress,
           updaterStatus: args[1],
         })
+
         window.setTimeout(() => {
           this.checkUpdaterStatus()
         }, 200)
@@ -43,6 +44,12 @@ export default class Updater extends React.Component {
 
   checkUpdaterStatus = () => {
     window.electron.ipcRenderer.sendMessage('ipc-example', ["updater-status"]);
+  }
+  updaterDownload = () => {
+    window.electron.ipcRenderer.sendMessage('ipc-example', ["updater-download"]);
+  }
+  updaterQuitAndInstall = () => {
+    window.electron.ipcRenderer.sendMessage('ipc-example', ["updater-quit-and-install"]);
   }
   componentDidMount() {
     this.onIpcExample()
@@ -68,21 +75,18 @@ export default class Updater extends React.Component {
                   (
                     this.state.downloadStatus == 0 ?
                       (
-                        <div>下载更新</div>
+                        <div>有新版本，<a onClick={this.updaterDownload} className="updater-download-btn">下载更新</a></div>
                       )
                       :
                       this.state.downloadStatus == 1 ?
                         (
                           <div>
-                            <div>下载中</div>
-                            <div>
-                              下载进度：{JSON.stringify(this.state.progress)}
-                            </div>
+                            下载中，下载进度：<span className="">{this.state.progress.percent} %</span>
                           </div>
                         )
                         :
                         (
-                          <div>下载完成</div>
+                          <div>下载完成，<a onClick={this.updaterQuitAndInstall} className="updater-quit-and-install-btn">立即安装</a></div>
                         )
                   ) :
                   (

@@ -6,8 +6,11 @@ import { startServer } from './server';
 import log from 'electron-log';
 
 
-export let getPageUrl = (): string => {
+export let getPageUrl = (page: string): string => {
     let pageUrl = resolveHtmlPath('index.html')
+    if (page != null && page != "") {
+        pageUrl += "#" + page
+    }
     return pageUrl
 }
 
@@ -42,14 +45,9 @@ export const onFindServerUrl = (url: string) => {
 
 export const onServerStop = () => {
     if (mainWindow != null && !mainWindow.isDestroyed()) {
-        let url = getPageUrl()
+        let url = getPageUrl("/server")
         log.info("onServerStop to url:", url)
         mainWindow.loadURL(url);
-        setTimeout(() => {
-            if (mainWindow) {
-                mainWindow.webContents.send("ipc-example", ["to-page", '/server'])
-            }
-        }, 200)
     }
 }
 export const refreshMainWindow = () => {
@@ -98,13 +96,10 @@ export const startMainWindow = async () => {
         },
     });
 
-    mainWindow.loadURL(getPageUrl());
+    mainWindow.loadURL(getPageUrl("/server"));
 
     mainWindow.on('ready-to-show', () => {
         log.info("main window ready-to-show")
-        if (mainWindow) {
-            mainWindow.webContents.send("ipc-example", ["to-page", '/server'])
-        }
         if (mainWindowReadyde) {
             return
         }

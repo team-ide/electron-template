@@ -175,9 +175,11 @@ export const startServer = () => {
                 let msg = data.toString()
                 log.info("server processor stdout:", msg);
                 if (msg.startsWith("event:serverUrl:")) {
-                    let serverUrl = msg.substring("event:serverUrl:".length)
-                    log.info("onFindServerUrl:", serverUrl);
-                    onFindServerUrl(serverUrl)
+                    if (config.window.useServerUrl) {
+                        let serverUrl = msg.substring("event:serverUrl:".length)
+                        log.info("onFindServerUrl:", serverUrl);
+                        onFindServerUrl(serverUrl)
+                    }
                     return
                 }
             });

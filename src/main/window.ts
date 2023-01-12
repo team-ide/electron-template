@@ -1,16 +1,33 @@
-import { resolveHtmlPath, options } from './util';
+import { resolveHtmlPath, options, getAssetPath } from './util';
 import path from 'path';
 import { app, BrowserWindow, shell, Menu, screen } from 'electron';
 import config from './config';
 import { startServer } from './server';
+import { destroyAll } from './main';
 import log from 'electron-log';
 
 
-export let getPageUrl = (page: string): string => {
+export let getRendererUrl = (page: string): string => {
     let pageUrl = resolveHtmlPath('index.html')
     if (page != null && page != "") {
         pageUrl += "#" + page
     }
+    return pageUrl
+}
+
+
+export let getPageUrl = (page: string): string => {
+    let pageUrl = null
+    if (page == null || page == "") {
+        pageUrl = getRendererUrl("")
+    } else {
+        if (page.indexOf("http") == 0) {
+            pageUrl = page
+        } else {
+            pageUrl = `file://${getAssetPath(page)}`
+        }
+    }
+
     return pageUrl
 }
 
@@ -45,7 +62,7 @@ export const onFindServerUrl = (url: string) => {
 
 export const onServerStop = () => {
     if (mainWindow != null && !mainWindow.isDestroyed()) {
-        let url = getPageUrl("/server")
+        let url = getRendererUrl("/server")
         log.info("onServerStop to url:", url)
         mainWindow.loadURL(url);
     }
@@ -64,6 +81,7 @@ export const startMainWindow = async () => {
         mainWindow.show()
         return
     }
+    log.info("start main window")
     // if (options.isDebug) {
     //     installExtensions();
     // }
@@ -74,21 +92,21 @@ export const startMainWindow = async () => {
     options.screenHeight = workAreaSize.height;
 
 
-    if (options.windowWidth > options.screenWidth) {
-        options.windowWidth = (options.screenWidth - 40);
+    if (config.window.width > options.screenWidth) {
+        config.window.width = (options.screenWidth - 40);
     }
-    if (options.windowHeight > options.screenHeight) {
-        options.windowHeight = (options.screenHeight - 40);
+    if (config.window.height > options.screenHeight) {
+        config.window.height = (options.screenHeight - 40);
     }
 
 
     mainWindow = new BrowserWindow({
         show: false,
-        width: options.windowWidth,
-        height: options.windowHeight,
+        title: config.window.title,
+        width: config.window.width,
+        height: config.window.height,
         icon: options.iconPath,
         autoHideMenuBar: true,
-        title: config.title,
         webPreferences: {
             preload: app.isPackaged
                 ? path.join(__dirname, 'preload.js')
@@ -96,7 +114,14 @@ export const startMainWindow = async () => {
         },
     });
 
-    mainWindow.loadURL(getPageUrl("/server"));
+    let toPageUrl = ""
+
+    if (config.window.useServerUrl) {
+        toPageUrl = getRendererUrl("/server")
+    } else {
+        toPageUrl = getPageUrl(config.window.index)
+    }
+    mainWindow.loadURL(toPageUrl);
 
     mainWindow.on('ready-to-show', () => {
         log.info("main window ready-to-show")
@@ -106,25 +131,27 @@ export const startMainWindow = async () => {
         if (!mainWindow) {
             throw new Error('"mainWindow" is not defined');
         }
+        startServer()
         mainWindowReadyde = true
-        if (config.openStartMinimized) {
+        if (config.window.hideWhenStart) {
+            log.info("main window hide when start")
             allWindowHide()
         } else {
             mainWindow.show();
         }
-        startServer()
     });
 
     mainWindow.on('close', (e) => {
         e.preventDefault();
+        log.info("main window close")
 
         // 如果 开启关闭最小化 则 隐藏窗口 
-        if (config.openCloseWindowMinimize) {
+        if (config.window.hideWhenClose) {
+            log.info("main window hide when close")
             allWindowHide()
         } else {
-            if (mainWindow != null && !mainWindow.isDestroyed()) {
-                mainWindow.hide()
-            }
+            log.info("main window close destroy all")
+            destroyAll()
         }
     });
 

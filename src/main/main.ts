@@ -17,6 +17,8 @@ import { toAppUpdater, updaterDestroy } from './updater';
 
 import log from 'electron-log';
 
+log.info("app start")
+
 // 忽略https证书相关错误，加在electron相关js文件里，有app的地方
 app.commandLine.appendSwitch('ignore-certificate-errors')
 
@@ -37,9 +39,10 @@ app.commandLine.appendSwitch('ignore-certificate-errors')
  */
 
 app.on('window-all-closed', () => {
+  log.info("on window all closed")
   // Respect the OSX convention of having the application in memory even
   // after all windows have been closed
-  if (config.openStartMinimized || config.openCloseWindowMinimize) {
+  if (config.window.hideWhenStart || config.window.hideWhenClose) {
     return
   }
   if (process.platform !== 'darwin') {
@@ -50,8 +53,10 @@ app.on('window-all-closed', () => {
 app
   .whenReady()
   .then(() => {
+    log.info("on app ready")
     startMainWindow();
     app.on('activate', () => {
+      log.info("on app activate")
       // On macOS it's common to re-create a window in the app when the
       // dock icon is clicked and there are no other windows open.
       startMainWindow();
@@ -152,6 +157,7 @@ export const getMenuItemById = (id: string): MenuItem | null => {
 
 
 app.on('ready', async () => {
+  log.info("on app ready")
   tray = new Tray(trayImage)
 
   tray.setToolTip(config.tray.toolTip)
@@ -171,6 +177,7 @@ app.on('ready', async () => {
 
 
 export const destroyAll = () => {
+  log.info("destroy all start")
   options.isStopped = true
   try {
     allWindowDestroy()
@@ -202,4 +209,5 @@ export const destroyAll = () => {
   } catch (error) {
     log.error("app quit error:", error)
   }
+  log.info("destroy all end")
 }

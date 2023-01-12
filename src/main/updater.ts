@@ -4,7 +4,7 @@ import { autoUpdater } from 'electron-updater';
 import { app, MenuItem, BrowserWindow } from 'electron';
 import { getMenuItemById, destroyAll } from './main';
 import { options } from './util';
-import { getPageUrl } from './window';
+import { getRendererUrl } from './window';
 import path from 'path';
 import log from 'electron-log';
 
@@ -47,7 +47,7 @@ export const startUpdaterWindow = async () => {
   });
 
 
-  updaterWindow.loadURL(getPageUrl('/updater'));
+  updaterWindow.loadURL(getRendererUrl('/updater'));
 
   updaterWindow.on('ready-to-show', () => {
     if (!updaterWindow) {

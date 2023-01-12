@@ -13,7 +13,6 @@ export function resolveHtmlPath(htmlFileName: string) {
   return `file://${path.resolve(__dirname, '../renderer/', htmlFileName)}`;
 }
 
-
 export const RESOURCES_PATH = app.isPackaged
   ? path.join(process.resourcesPath, 'assets')
   : path.join(__dirname, '../../assets');
@@ -36,8 +35,6 @@ export const options = {
   isStopped: false,
   screenWidth: 1440,
   screenHeight: 900,
-  windowWidth: 1440,
-  windowHeight: 900,
   rootDir: getRootPath("./"),
   isDebug: process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true',
   isDarwin: process.platform === 'darwin',

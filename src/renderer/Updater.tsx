@@ -94,7 +94,7 @@ export default class Updater extends React.Component {
                       this.state.downloadStatus == 1 ?
                         (
                           <div>
-                            下载中，下载进度：<span className="">{this.state.progress.percent} %</span>
+                            下载中，进度：<span className="">{this.state.progress.percent} %</span>
                           </div>
                         )
                         :

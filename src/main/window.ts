@@ -131,7 +131,6 @@ export const startMainWindow = async () => {
         if (!mainWindow) {
             throw new Error('"mainWindow" is not defined');
         }
-        startServer()
         mainWindowReadyde = true
         if (config.window.hideWhenStart) {
             log.info("main window hide when start")
@@ -139,6 +138,7 @@ export const startMainWindow = async () => {
         } else {
             mainWindow.show();
         }
+        startServer()
     });
 
     mainWindow.on('close', (e) => {

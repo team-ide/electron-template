@@ -1,5 +1,6 @@
 {
   "name": "electron-template",
   "version": "1.0.0",
-  "main": "./dist/main/main.js"
+  "main": "./dist/main/main.js",
+  "dependencies": {}
 }

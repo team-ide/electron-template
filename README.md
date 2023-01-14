@@ -2,6 +2,8 @@
 
 使用 Electron 启动桌面程序模板，后台启动服务
 
+源码 由 修改 [electron-react-boilerplate](https://github.com/electron-react-boilerplate/electron-react-boilerplate)
+
 ## 使用说明
 
 

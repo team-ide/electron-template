@@ -33,6 +33,7 @@ export const getRootPath = (...paths: string[]): string => {
 
 export const options = {
   isStopped: false,
+  willQuitApp: false,
   screenWidth: 1440,
   screenHeight: 900,
   rootDir: getRootPath("./"),

@@ -142,6 +142,9 @@ export const startMainWindow = async () => {
     });
 
     mainWindow.on('close', (e) => {
+        if (options.willQuitApp) {
+            return
+        }
         e.preventDefault();
         log.info("main window close")
 

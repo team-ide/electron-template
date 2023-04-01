@@ -77,7 +77,7 @@ const onServerStarted = () => {
 const onServerStoped = () => {
     serverStatus.isStopped = true
     serverStatus.isStarting = false
-    if (options.isStopped) {
+    if (options.isStopped || options.willQuitApp) {
         serverStatus.error = ""
         log.info(`server is stopped`);
     } else {

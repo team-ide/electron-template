@@ -35,7 +35,7 @@ export default class Server extends React.Component {
           this.checkServerStatus()
         }, 200)
       } else if (args[0] == 'script-execute-result' && args[1]) {
-        alert(JSON.stringify(args[1]))
+        // alert(JSON.stringify(args[1]))
       }
       this.onIpcExample()
     });
@@ -51,11 +51,11 @@ export default class Server extends React.Component {
     window.electron.ipcRenderer.sendMessage('ipc-example', ["server-stop"]);
   }
   callScriptExecute = () => {
-  //   let script = `
+    //   let script = `
 
-  //  context.window.mainWindow.setAlwaysOnTop(true);
-  //   `;
-  //   window.electron.ipcRenderer.sendMessage('ipc-example', ["script-execute", script]);
+    //  context.window.mainWindow.setAlwaysOnTop(true);
+    //   `;
+    //   window.electron.ipcRenderer.sendMessage('ipc-example', ["script-execute", script]);
   }
   callToServerUrl = () => {
 

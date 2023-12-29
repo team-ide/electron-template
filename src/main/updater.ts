@@ -67,9 +67,11 @@ let updaterDoing = false
 let onStart = () => {
   updaterDoing = true
   startUpdaterWindow()
+  updaterWindow && updaterWindow.setClosable(false);
 }
 let onEnd = () => {
   updaterDoing = false
+  updaterWindow && updaterWindow.setClosable(true);
 }
 
 export const updaterDownload = () => {
@@ -117,12 +119,14 @@ export const toAppUpdater = async () => {
 
   //检查事件
   autoUpdater.on('checking-for-update', () => {
+    updaterStatus.downloadStatus = 0
     updaterStatus.checking = true
     log.info('autoUpdater on checking-for-update')
   });
 
   //发现新版本
   autoUpdater.on('update-available', () => {
+    updaterStatus.downloadStatus = 0
     updaterStatus.checking = false
     updaterStatus.hasNew = true
     log.info('autoUpdater on update-available')
@@ -131,6 +135,7 @@ export const toAppUpdater = async () => {
 
   //当前版本为最新版本
   autoUpdater.on('update-not-available', () => {
+    updaterStatus.downloadStatus = 0
     updaterStatus.checking = false
     updaterStatus.hasNew = false
     log.info('autoUpdater on update-not-available')
@@ -168,11 +173,13 @@ export const toAppUpdater = async () => {
   try {
     let res = await autoUpdater.checkForUpdatesAndNotify()
     if (res == null) {
+      updaterStatus.downloadStatus = 0
       onEnd()
     }
     log.info('autoUpdater checkForUpdatesAndNotify res:', res)
   } catch (error) {
     log.error('autoUpdater error', error)
+    updaterStatus.downloadStatus = 0
     onEnd()
   }
 };

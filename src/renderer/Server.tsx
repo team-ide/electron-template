@@ -34,6 +34,8 @@ export default class Server extends React.Component {
         window.setTimeout(() => {
           this.checkServerStatus()
         }, 200)
+      } else if (args[0] == 'script-execute-result' && args[1]) {
+        alert(JSON.stringify(args[1]))
       }
       this.onIpcExample()
     });
@@ -48,6 +50,13 @@ export default class Server extends React.Component {
   callServerStop = () => {
     window.electron.ipcRenderer.sendMessage('ipc-example', ["server-stop"]);
   }
+  callScriptExecute = () => {
+  //   let script = `
+
+  //  context.window.mainWindow.setAlwaysOnTop(true);
+  //   `;
+  //   window.electron.ipcRenderer.sendMessage('ipc-example', ["script-execute", script]);
+  }
   callToServerUrl = () => {
 
   }
@@ -56,9 +65,11 @@ export default class Server extends React.Component {
   componentDidMount() {
     this.onIpcExample()
     this.checkServerStatus()
+    this.callScriptExecute()
     //直接赋值，不会重新渲染html。必须调用setState方法才会监听到html是否变化，然后react才再重新渲染。
     //并非直接的双向数据绑定
     //this.state.text = "byebye world";
+
   }
   render() {
     return (

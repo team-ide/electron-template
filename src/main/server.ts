@@ -193,6 +193,7 @@ export const stopServer = () => {
     serverProcessor.kill()
 }
 
+export const listenEvents: any = {};
 
 ipcMain.on('ipc-example', async (event, arg) => {
     if (arg == 'server-status') {
@@ -221,15 +222,60 @@ ipcMain.on('ipc-example', async (event, arg) => {
         updater.updaterQuitAndInstall()
         event.reply('ipc-example', ['updater-status', updater.updaterStatus]);
         return
-    } else if (arg.length && arg.length > 1 && arg[0] == 'script-execute') {
-        let res = scriptExecute(arg[1])
-        event.reply('ipc-example', ['script-execute-result', res]);
+    } else if (arg.length && arg.length > 1 && arg[0] == 'do') {
+        let id = arg[1];
+        let param = arg[2] || {};
+        let res = null;
+        log.info('ipc-example do:', id, param)
+        switch (param.method) {
+            case 'script-execute':
+                res = scriptExecute(param.script)
+                break;
+            case 'set-cache':
+                cacheData[param.key] = param.value
+                break;
+            case 'get-cache':
+                res = cacheData[param.key]
+                break;
+            case 'remove-cache':
+                delete cacheData[param.key]
+                break;
+            case 'new-window':
+                res = window.newWindow(param.options)
+                break;
+            case 'on-listen':
+                let es1 = listenEvents[param.listenKey] || []
+                es1.push(event)
+                listenEvents[param.listenKey] = es1
+                break;
+            case 'notify-listen':
+                let es2 = listenEvents[param.listenKey]
+                delete listenEvents[param.listenKey]
+                if (es2) {
+                    es2.forEach((e: Electron.IpcMainEvent) => {
+                        e.reply('ipc-example', ['on-listen', param.listenKey, param]);
+                    })
+                }
+                break;
+            case 'remove-listen':
+                let es3 = listenEvents[param.listenKey]
+                delete listenEvents[param.listenKey]
+                if (es3) {
+                    es3.forEach((e: Electron.IpcMainEvent) => {
+                        e.reply('ipc-example', ['on-listen', param.listenKey]);
+                    })
+                }
+                break;
+            default:
+                break;
+        }
+        event.reply('ipc-example', ['do-result', id, res]);
         return
     }
 });
 
 
-let this_ = this;
+export const cacheData: any = {};
 let scriptExecute = function (script: any) {
     if (script == null || script == "") {
         return;
@@ -242,11 +288,11 @@ let scriptExecute = function (script: any) {
             log,
             main,
             util,
+            cacheData,
         }
         let executeScript = "\n(()=>{\n";
         executeScript += script
         executeScript += '\n})()'
-        log.info('script execute:', executeScript)
         return eval(executeScript)
     } catch (e) {
         log.error('script execute error:', e)

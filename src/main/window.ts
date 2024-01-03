@@ -2,7 +2,7 @@ import { resolveHtmlPath, options, getAssetPath } from './util';
 import path from 'path';
 import { app, BrowserWindow, shell, Menu, screen } from 'electron';
 import config from './config';
-import { startServer } from './server';
+import { startServer, cacheData, listenEvents } from './server';
 import { destroyAll } from './main';
 import log from 'electron-log';
 
@@ -207,11 +207,18 @@ let windowIndex = 0
 // hiddenInset - 在隐藏的标题栏中显示交通灯按钮稍微偏离窗口边缘的替代外观。
 // customButtonsOnHover布尔（可选） - 在macOS无框窗口上绘制自定义关闭，最小化和全屏按钮。这些按钮不会显示，除非在窗口的左上角悬停。这些自定义按钮可防止与标准窗口工具栏按钮发生的鼠标事件相关的问题。注意：此选项目前是实验性的。
 
-export const newWindow = async (opt: any) => {
+export const newWindow = (opt: any) => {
     windowIndex++
     let key = opt.key || windowIndex
+    key = '' + key
+    let cacheKey: any = null;
+    if (opt.cacheKey && opt.cacheData) {
+        cacheKey = opt.cacheKey
+        log.info("cacheData set cacheKey:", cacheKey)
+        cacheData[cacheKey] = opt.cacheData
+    }
     let win = new BrowserWindow({
-        show: false,
+        show: true,
         title: opt.title || config.window.title,
         width: opt.width || config.window.width,
         height: opt.height || config.window.height,
@@ -244,6 +251,22 @@ export const newWindow = async (opt: any) => {
 
     win.on('close', (e) => {
         destroyWindow(key)
+        if (cacheKey != null) {
+            log.info("cacheData delete cacheKey:", cacheKey)
+            delete cacheData[cacheKey]
+        }
+        if (opt.listenKeys) {
+            opt.listenKeys.forEach((listenKey: any) => {
+                log.info("listenData delete listenKey:", listenKey)
+                let es = listenEvents[listenKey]
+                delete listenEvents[listenKey]
+                if (es) {
+                    es.forEach((e: Electron.IpcMainEvent) => {
+                        e.reply('ipc-example', ['on-listen', listenKey]);
+                    })
+                }
+            })
+        }
     });
     return key;
 };

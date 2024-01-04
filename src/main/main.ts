@@ -11,7 +11,7 @@
 import { app, Menu, Tray, MenuItem } from 'electron';
 import config from './config';
 import { options } from './util';
-import { startMainWindow, checkWindowHideOrShow, allWindowDestroy, refreshMainWindow } from './window';
+import { startMainWindow, checkWindowHideOrShow, allWindowDestroy, refreshAllWindow } from './window';
 import { stopServer, restartServer } from './server';
 import { toAppUpdater, updaterDestroy } from './updater';
 
@@ -74,7 +74,7 @@ export const appMenu: any = {
     visible: true,
     enabled: true,
     click: function () {
-      refreshMainWindow()
+      refreshAllWindow()
     },
   },
   stopServerMenu: {

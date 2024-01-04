@@ -67,11 +67,17 @@ export const onServerStop = () => {
         mainWindow.loadURL(url);
     }
 }
-export const refreshMainWindow = () => {
+export const refreshAllWindow = () => {
     if (mainWindow != null && !mainWindow.isDestroyed()) {
         log.info("refresh main window")
         mainWindow.reload()
     }
+    let list = getAllWindows()
+    list.forEach(one => {
+        if (one != null && !one.isDestroyed()) {
+            one.reload()
+        }
+    })
 }
 var mainWindowReadyde = false
 
@@ -209,8 +215,8 @@ let windowIndex = 0
 
 export const newWindow = (opt: any) => {
     windowIndex++
-    let key = opt.key || windowIndex
-    key = '' + key
+    let windowKey = opt.windowKey || windowIndex
+    windowKey = '' + windowKey
     let cacheKey: any = null;
     if (opt.cacheKey && opt.cacheData) {
         cacheKey = opt.cacheKey
@@ -236,7 +242,7 @@ export const newWindow = (opt: any) => {
     if (opt.parentKey && windowCache[opt.parentKey]) {
         win.setParentWindow(windowCache[opt.parentKey])
     }
-    windowCache[key] = win
+    windowCache[windowKey] = win
 
     if (opt.url) {
         win.loadURL(opt.url);
@@ -247,10 +253,13 @@ export const newWindow = (opt: any) => {
             throw new Error('"win" is not defined');
         }
         win.show()
+        if (opt.title) {
+            win.setTitle(opt.title)
+        }
     });
 
     win.on('close', (e) => {
-        destroyWindow(key)
+        destroyWindow(windowKey)
         if (cacheKey != null) {
             log.info("cacheData delete cacheKey:", cacheKey)
             delete cacheData[cacheKey]
@@ -268,7 +277,7 @@ export const newWindow = (opt: any) => {
             })
         }
     });
-    return key;
+    return windowKey;
 };
 export const showWindow = (key: any) => {
     let win = getWindow(key)

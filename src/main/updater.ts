@@ -101,6 +101,7 @@ export const toAppUpdater = async () => {
     startUpdaterWindow()
     return
   }
+  updaterStatus.error = ""
   onStart()
   let updaterMenu: MenuItem | null
   updaterMenu = getMenuItemById("updaterMenu")

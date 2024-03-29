@@ -226,7 +226,7 @@ ipcMain.on('ipc-example', async (event, arg) => {
         let id = arg[1];
         let param = arg[2] || {};
         let res = null;
-        log.info('ipc-example do:', id, param)
+        // log.info('ipc-example do:', id, param)
         switch (param.method) {
             case 'script-execute':
                 res = scriptExecute(param.script)

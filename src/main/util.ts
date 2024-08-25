@@ -41,7 +41,7 @@ export const options = {
   isDarwin: process.platform === 'darwin',
   isWindows: process.platform === 'win32',
   isLinux: process.platform === 'linux',
-  isAmd64: process.arch === 'amd64',
+  isAmd64: process.arch === 'x64',
   isArm64: process.arch === 'arm64',
   iconPath: getAssetPath('icons/icon.png'),
   icon16Path: getAssetPath('icons/icon-16.png'),

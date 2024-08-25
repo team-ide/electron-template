@@ -10,15 +10,32 @@ import log from 'electron-log';
 let serverProcessor: ChildProcess | null = null
 
 
+let getServerConfig = () => {
 
-let serverConfig = null
-if (util.options.isWindows) {
-    serverConfig = config.server.win;
-} else if (util.options.isLinux) {
-    serverConfig = config.server.linux;
-} else if (util.options.isDarwin) {
-    serverConfig = config.server.darwin;
+    let res = null;
+    if (util.options.isWindows) {
+        if (util.options.isAmd64) {
+            res = config.server.win.amd64;
+        } else if (util.options.isArm64) {
+            res = config.server.win.arm64;
+        }
+    } else if (util.options.isLinux) {
+        if (util.options.isAmd64) {
+            res = config.server.linux.amd64;
+        } else if (util.options.isArm64) {
+            res = config.server.linux.arm64;
+        }
+    } else if (util.options.isDarwin) {
+        if (util.options.isAmd64) {
+            res = config.server.darwin.amd64;
+        } else if (util.options.isArm64) {
+            res = config.server.darwin.arm64;
+        }
+    }
+    return res;
 }
+let serverConfig = getServerConfig()
+
 
 export const serverStatus = {
     isStopped: true,
@@ -75,7 +92,9 @@ export const startServer = () => {
     try {
         if (serverProcessor != null) {
             return
-        } else if (config.server == null) {
+        }
+        let serverConfig = getServerConfig()
+        if (serverConfig == null) {
             log.info("没有服务配置")
             return
         }
@@ -93,10 +112,10 @@ export const startServer = () => {
             menuItem.visible = true
         }
 
-        log.info("server config:", config.server)
+        log.info("server config:", serverConfig)
 
         let serverDir = util.getRootPath(config.server.dir)
-        let libDir = util.getRootPath(config.server.libDir)
+        let libDir = util.getRootPath(serverConfig.libDir)
         log.info("serverDir:", serverDir)
         log.info("libDir:", libDir)
         var cmdOptions = {
@@ -104,17 +123,13 @@ export const startServer = () => {
             env: process.env,
         };
 
-        let serverConfig = null
         if (util.options.isWindows) {
-            serverConfig = config.server.win;
             cmdOptions.env.PATH += ";" + libDir;
             cmdOptions.env.LD_LIBRARY_PATH += ";" + libDir;
         } else if (util.options.isLinux) {
-            serverConfig = config.server.linux;
             cmdOptions.env.PATH += ":" + libDir;
             cmdOptions.env.LD_LIBRARY_PATH += ":" + libDir;
         } else if (util.options.isDarwin) {
-            serverConfig = config.server.darwin;
             cmdOptions.env.PATH += ":" + libDir;
             cmdOptions.env.LD_LIBRARY_PATH += ":" + libDir;
         }

@@ -21,22 +21,44 @@ export default {
     server: {
         // 服务根目录
         dir: "./assets/server",
-        // so、dll库等
-        libDir: "",
         // darwin 系统服务配置
         darwin: {
-            exec: "./server",
-            args: ["-isElectron", "1"],
+            amd64: {
+                libDir: "",
+                exec: "./server",
+                args: ["-isElectron", "1"],
+            },
+            arm64: {
+                libDir: "",
+                exec: "./server",
+                args: ["-isElectron", "1"],
+            },
         },
         // linux 系统服务配置
         linux: {
-            exec: "./server",
-            args: ["-isElectron", "1"],
+            amd64: {
+                libDir: "",
+                exec: "./server",
+                args: ["-isElectron", "1"],
+            },
+            arm64: {
+                libDir: "",
+                exec: "./server",
+                args: ["-isElectron", "1"],
+            },
         },
         // win 系统服务配置
         win: {
-            exec: "./server.exe",
-            args: ["-isElectron", "1"],
+            amd64: {
+                libDir: "",
+                exec: "./server",
+                args: ["-isElectron", "1"],
+            },
+            arm64: {
+                libDir: "",
+                exec: "./server",
+                args: ["-isElectron", "1"],
+            },
         }
     },
 }

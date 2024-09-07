@@ -16,6 +16,10 @@ export default {
         hideWhenClose: true,
         // 开启 启动最小化
         hideWhenStart: false,
+        // 最大化
+        maximize: false,
+        // 全屏
+        fullScreen: false,
     },
     // 服务配置
     server: {

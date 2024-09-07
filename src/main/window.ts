@@ -129,6 +129,13 @@ export const startMainWindow = async () => {
     }
     mainWindow.loadURL(toPageUrl);
 
+    if (config.window.maximize) {
+        mainWindow.maximize()
+    }
+    if (config.window.fullScreen) {
+        mainWindow.setFullScreen(true)
+    }
+
     mainWindow.on('ready-to-show', () => {
         log.info("main window ready-to-show")
         if (mainWindowReadyde) {

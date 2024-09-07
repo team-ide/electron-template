@@ -13,23 +13,23 @@ let serverProcessor: ChildProcess | null = null
 let getServerConfig = () => {
 
     let res = null;
-    if (util.options.isWindows) {
+    if (util.options.isWindows && config.server.win) {
         if (util.options.isAmd64) {
-            res = config.server.win.amd64;
+            res = config.server.win.amd64 || null;
         } else if (util.options.isArm64) {
-            res = config.server.win.arm64;
+            res = config.server.win.arm64 || null;
         }
-    } else if (util.options.isLinux) {
+    } else if (util.options.isLinux && config.server.linux) {
         if (util.options.isAmd64) {
-            res = config.server.linux.amd64;
+            res = config.server.linux.amd64 || null;
         } else if (util.options.isArm64) {
-            res = config.server.linux.arm64;
+            res = config.server.linux.arm64 || null;
         }
-    } else if (util.options.isDarwin) {
+    } else if (util.options.isDarwin && config.server.darwin) {
         if (util.options.isAmd64) {
-            res = config.server.darwin.amd64;
+            res = config.server.darwin.amd64 || null;
         } else if (util.options.isArm64) {
-            res = config.server.darwin.arm64;
+            res = config.server.darwin.arm64 || null;
         }
     }
     return res;

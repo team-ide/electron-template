@@ -22,6 +22,10 @@ log.info("app start")
 // 忽略https证书相关错误，加在electron相关js文件里，有app的地方
 app.commandLine.appendSwitch('ignore-certificate-errors')
 
+// 置空 菜单
+const menu = Menu.buildFromTemplate([]);
+Menu.setApplicationMenu(menu);
+
 // if (process.env.NODE_ENV === 'production') {
 //   const sourceMapSupport = require('source-map-support');
 //   sourceMapSupport.install();
